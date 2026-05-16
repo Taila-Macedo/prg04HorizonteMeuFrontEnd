@@ -1,0 +1,534 @@
+/* ---- BASE MOBILE (até 600px) ---- */
+
+.admin-page {
+    background-color: var(--azul-profundo);
+    color: var(--branco);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse at 10% 0%, rgba(0,91,197,0.25) 0%, transparent 55%);
+}
+
+/* ---- HEADER ---- */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+    background-color: var(--azul-escuro);
+    border-bottom: 2px solid rgba(0,180,252,0.3);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-brand span { font-size: 1.8rem; }
+
+.header-brand h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--dourado);
+    font-size: 1rem;
+}
+
+.header-brand small {
+    display: block;
+    color: var(--azul-claro);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-home {
+    background: rgba(0,91,197,0.3);
+    border: 1px solid var(--azul-medio);
+    color: var(--branco);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-home:hover {
+    background: rgba(0,180,252,0.15);
+    border-color: var(--azul-claro);
+}
+
+/* ---- MAIN ---- */
+.admin-main {
+    max-width: 1100px;
+    margin: 16px auto;
+    padding: 0 10px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+    margin-bottom: 28px;
+}
+
+.page-title h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--dourado);
+    font-size: 1.3rem;
+    border-left: 4px solid var(--dourado);
+    padding-left: 14px;
+}
+
+.page-title p {
+    color: var(--azul-claro);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    padding-left: 18px;
+}
+
+/* ---- TOOLBAR ---- */
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(1, 38, 119, 0.5);
+    border: 1px solid rgba(0, 91, 197, 0.4);
+    border-radius: 8px;
+    padding: 10px 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-box span { font-size: 1rem; opacity: 0.7; }
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--branco);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.search-box input::placeholder { color: rgba(247,248,252,0.35); }
+
+.btn-add {
+    background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+    border: none;
+    border-radius: 8px;
+    color: var(--azul-profundo);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 8px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(240, 165, 0, 0.35);
+}
+
+/* ---- TABELA ---- */
+.table-wrapper {
+    background: rgba(1, 38, 119, 0.4);
+    border: 1px solid rgba(0, 91, 197, 0.3);
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 420px;
+}
+
+thead {
+    background: rgba(0, 91, 197, 0.35);
+}
+
+thead th {
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--azul-claro);
+    border-bottom: 1px solid rgba(0,180,252,0.2);
+}
+
+tbody tr {
+    border-bottom: 1px solid rgba(0, 91, 197, 0.2);
+    transition: background 0.2s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+
+tbody tr:hover {
+    background: rgba(0, 91, 197, 0.15);
+}
+
+tbody td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    color: var(--branco);
+    vertical-align: middle;
+}
+
+/* ID badge */
+.id-badge {
+    display: inline-block;
+    background: rgba(0, 180, 252, 0.15);
+    color: var(--azul-claro);
+    border: 1px solid rgba(0,180,252,0.3);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+/* avatar inicial */
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--azul-medio), var(--azul-claro));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--azul-profundo);
+    flex-shrink: 0;
+}
+
+/* email */
+.email-cell {
+    color: rgba(247,248,252,0.7);
+    font-size: 0.85rem;
+}
+
+/* role badge */
+.role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.role-admin {
+    background: rgba(240, 165, 0, 0.15);
+    color: var(--dourado);
+    border: 1px solid rgba(240,165,0,0.3);
+}
+
+.role-user {
+    background: rgba(0, 180, 252, 0.1);
+    color: var(--azul-claro);
+    border: 1px solid rgba(0,180,252,0.25);
+}
+
+/* ---- BOTOES DE ACAO ---- */
+.acoes {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.btn-editar, .btn-excluir {
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+.btn-editar {
+    background: rgba(0, 91, 197, 0.3);
+    color: var(--azul-claro);
+    border: 1px solid rgba(0,180,252,0.35);
+}
+
+.btn-editar:hover {
+    background: rgba(0,180,252,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,180,252,0.2);
+}
+
+.btn-excluir {
+    background: rgba(231, 76, 60, 0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(231,76,60,0.35);
+}
+
+.btn-excluir:hover {
+    background: rgba(231,76,60,0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231,76,60,0.2);
+}
+
+/* ---- RODAPE TABELA ---- */
+.table-footer {
+    padding: 12px 18px;
+    background: rgba(0, 20, 73, 0.3);
+    border-top: 1px solid rgba(0, 91, 197, 0.2);
+    font-size: 0.78rem;
+    color: rgba(247,248,252,0.45);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ---- MODAL CONFIRMACAO EXCLUSAO ---- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+    background: var(--azul-escuro);
+    border: 1px solid rgba(231,76,60,0.4);
+    border-radius: 14px;
+    padding: 36px 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal .modal-icon { font-size: 2.5rem; margin-bottom: 14px; }
+
+.modal h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--branco);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.modal p {
+    color: rgba(247,248,252,0.65);
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.modal-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-cancelar {
+    background: rgba(0,91,197,0.25);
+    border: 1px solid var(--azul-medio);
+    color: var(--branco);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancelar:hover { background: rgba(0,180,252,0.15); }
+
+.btn-confirmar-excluir {
+    background: var(--vermelho);
+    border: none;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-confirmar-excluir:hover { background: var(--vermelho-hover); }
+
+/* ---- LINHA OCULTA (excluida) ---- */
+tr.excluido { display: none; }
+
+/* ---- RESPONSIVE ---- */
+
+/* ========== BREAKPOINT 2: TABLET (601px a 1024px)=================== */
+@media (min-width: 601px) {
+
+    .admin-header {
+        padding: 14px 20px;
+    }
+
+    .header-brand h1 {
+        font-size: 1.2rem;
+    }
+
+    .header-brand small {
+        font-size: 0.65rem;
+    }
+
+    .admin-main {
+        padding: 0 14px;
+        margin: 24px auto;
+    }
+
+    .page-title h2 {
+        font-size: 1.5rem;
+    }
+
+    /*toolbar em linha*/
+    .toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-box {
+        width: 260px;
+    }
+
+    .btn-add {
+        font-size: 0.82rem;
+        padding: 9px 16px;
+    }
+
+    /*exibe a coluna Perfil no tablet*/
+    thead th:nth-child(4),
+    tbody td:nth-child(4) {
+        display: table-cell;
+    }
+
+    table {
+        min-width: unset;
+    }
+
+    thead th {
+        padding: 12px 14px;
+        font-size: 0.68rem;
+    }
+
+    tbody td {
+        padding: 12px 14px;
+        font-size: 0.85rem;
+    }
+
+    .btn-editar, .btn-excluir {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+    }
+
+    .acoes { gap: 6px; }
+}
+
+/* =============BREAKPOINT 3: DESKTOP (acima de 1025px)=================================== */
+@media (min-width: 1025px) {
+
+    .admin-header {
+        padding: 18px 40px;
+    }
+
+    .header-brand h1 {
+        font-size: 1.4rem;
+    }
+
+    .header-brand small {
+        font-size: 0.7rem;
+    }
+    
+    .admin-main {
+        padding: 0 24px;
+        margin: 40px auto;
+    }
+
+    .page-title h2 {
+        font-size: 1.7rem;
+    }
+
+    .search-box {
+        width: 280px;
+    }
+
+    .btn-add {
+        font-size: 0.85rem;
+        padding: 10px 20px;
+    }
+
+    thead th {
+        padding: 14px 18px;
+        font-size: 0.72rem;
+    }
+
+    tbody td {
+        padding: 14px 18px;
+        font-size: 0.9rem;
+    }
+
+    .btn-editar, .btn-excluir {
+        font-size: 0.78rem;
+        padding: 7px 14px;
+    }
+
+    .acoes { gap: 8px; }
+}
