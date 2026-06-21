@@ -34,6 +34,51 @@ body {
 .login-logo h1 { font-family: 'Playfair Display', serif; color: var(--dourado); font-size: 1.8rem; }
 .login-logo p { color: var(--azul-claro); font-size: 0.82rem; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
 
+/* ===== BOTÃO GOOGLE ===== */
+.btn-google {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px;
+    background: var(--branco);
+    border: 1.5px solid rgba(0, 91, 197, 0.3);
+    border-radius: 8px;
+    color: var(--azul-profundo);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    margin-bottom: 24px;
+}
+.btn-google:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); filter: brightness(0.97); }
+.btn-google:active { transform: translateY(0); }
+.google-icon { flex-shrink: 0; }
+
+/* ===== DIVISOR ===== */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 24px;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 180, 252, 0.25);
+}
+.divider span {
+    padding: 0 14px;
+    color: rgba(247, 248, 252, 0.45);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* ===== FLOATING LABEL ===== */
 .form-group {
     position: relative;
@@ -133,6 +178,16 @@ body {
 .login-footer { text-align: center; margin-top: 28px; }
 .login-footer a { color: var(--azul-claro); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
 .login-footer a:hover { color: var(--dourado); text-decoration: underline; }
+
+.cadastro-link {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 180, 252, 0.15);
+    color: rgba(247, 248, 252, 0.6);
+    font-size: 0.85rem;
+}
+.cadastro-link a { color: var(--dourado); font-weight: 600; text-decoration: none; }
+.cadastro-link a:hover { text-decoration: underline; }
 
 .back-link { margin-top: 24px; color: rgba(247,248,252,0.5); font-size: 0.8rem; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
 .back-link:hover { color: var(--azul-claro); }

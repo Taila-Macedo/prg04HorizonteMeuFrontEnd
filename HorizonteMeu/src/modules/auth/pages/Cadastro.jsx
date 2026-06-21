@@ -1,34 +1,37 @@
 import { useState } from 'react'
 import '../styles/login.css'
 
-function LoginPage() {
+function CadastroPage() {
+  const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [showError, setShowError] = useState(false)
+  const [nomeTouched, setNomeTouched] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
   const [senhaTouched, setSenhaTouched] = useState(false)
 
+  const isNomeValid = nome.trim().length >= 2
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const isSenhaValid = senha.length >= 6
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (!isEmailValid || !isSenhaValid) {
+    if (!isNomeValid || !isEmailValid || !isSenhaValid) {
       setShowError(true)
       return
     }
 
     setShowError(false)
-    // Redirecionar para o painel admin
-    window.location.href = '/admin'
+    // TODO: integrar com POST /usuarios (cadastrar()) quando a API estiver pronta
+    window.location.href = '/dashboard'
   }
 
   const handleInputChange = () => {
     setShowError(false)
   }
 
-  const handleGoogleLogin = () => {
+  const handleGoogleCadastro = () => {
     // TODO: integrar com OAuth do Google futuramente
     window.location.href = '/dashboard'
   }
@@ -39,10 +42,10 @@ function LoginPage() {
         <div className="login-logo">
           <span className="icon">🧭</span>
           <h1>Horizonte Meu</h1>
-          <p>Acesso ao painel</p>
+          <p>Criar conta</p>
         </div>
 
-        <button type="button" className="btn-google" onClick={handleGoogleLogin}>
+        <button type="button" className="btn-google" onClick={handleGoogleCadastro}>
           <svg className="google-icon" viewBox="0 0 18 18" width="18" height="18">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.61z"/>
             <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18z"/>
@@ -53,10 +56,33 @@ function LoginPage() {
         </button>
 
         <div className="divider">
-          <span>ou entre com e-mail</span>
+          <span>ou cadastre-se com e-mail</span>
         </div>
 
-        <form id="form-login" noValidate onSubmit={handleSubmit}>
+        <form id="form-cadastro" noValidate onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder=" "
+              required
+              autoComplete="name"
+              title="Digite seu nome completo"
+              value={nome}
+              onChange={(e) => {
+                setNome(e.target.value)
+                handleInputChange()
+              }}
+              onBlur={() => setNomeTouched(true)}
+              className={nomeTouched ? (isNomeValid ? 'valid' : 'invalid') : ''}
+            />
+            <label htmlFor="nome">Nome completo</label>
+            <span className={`error-msg ${nomeTouched && !isNomeValid ? 'visible' : ''}`}>
+              Digite seu nome completo.
+            </span>
+          </div>
+
           <div className="form-group">
             <input
               type="email"
@@ -88,6 +114,7 @@ function LoginPage() {
               placeholder=" "
               required
               minLength={6}
+              autoComplete="new-password"
               title="A senha deve ter no mínimo 6 caracteres"
               value={senha}
               onChange={(e) => {
@@ -103,16 +130,15 @@ function LoginPage() {
             </span>
           </div>
 
-          <button type="submit" className="btn-login">🔐 Entrar</button>
+          <button type="submit" className="btn-login">🧭 Criar conta</button>
           <div id="msg-erro" className={showError ? 'visible' : ''}>
             ⚠️ Preencha todos os campos corretamente.
           </div>
         </form>
 
         <div className="login-footer">
-          <a href="#">Esqueceu a senha?</a>
           <p className="cadastro-link">
-            Ainda não tem conta? <a href="/cadastro">Cadastre-se</a>
+            Já tem uma conta? <a href="/login">Entrar</a>
           </p>
         </div>
       </div>
@@ -120,4 +146,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage;
+export default CadastroPage;
