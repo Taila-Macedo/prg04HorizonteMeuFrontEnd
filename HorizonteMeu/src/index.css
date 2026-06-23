@@ -1,5 +1,16 @@
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #020b1e; 
+    overflow-x: hidden; /*proteção contra barras horizontais */
 }

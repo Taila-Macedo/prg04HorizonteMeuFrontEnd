@@ -3,6 +3,7 @@ import DashboardPage from './modules/dashboard/pages/Dashboard';
 import LoginPage from './modules/auth/pages/Login';
 import CadastroPage from './modules/auth/pages/Cadastro';
 import PainelAdminPage from './modules/admin/pages/PainelAdm';
+import PerfilPage from './modules/profile/pages/Perfil';
 import './App.css';
 
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/cadastro" element={<CadastroPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/admin" element={<PainelAdminPage />} />
+        <Route path="/perfil" element={<PerfilPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

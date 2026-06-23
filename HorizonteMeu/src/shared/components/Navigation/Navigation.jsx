@@ -8,7 +8,7 @@ export function Navigation() {
 
   // Adicionamos a propriedade "to" nos itens para sabermos para onde ir
   const navItems = [
-    { icon: <Route size={20} />, label: 'Roteiros', id: 'roteiros', to: '/' },
+    { icon: <Route size={20} />, label: 'perfil por enquanto', id: 'roteiros', to: '/perfil' },
     { icon: <Heart size={20} />, label: 'Favoritos', id: 'favoritos', to: '/' },
     { icon: <Sparkles size={20} />, label: 'Sugestões IA', id: 'sugestoes', to: '/' }
   ];
@@ -57,7 +57,7 @@ export function Navigation() {
         </button>
 
         {/* TRANSFORMAÇÃO AQUI: Trocamos as divs antigas por um <Link> apontando para /login */}
-        <Link to="/login" className="nav-user-profile" title="Meu Perfil">
+        <Link to="/login" className="nav-user-profile" title="Login">
           <div className="nav-user-avatar">
             <User size={20} color="#ffffff" />
           </div>
