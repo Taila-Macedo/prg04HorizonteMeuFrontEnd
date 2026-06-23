@@ -5,6 +5,7 @@ import CadastroPage from './modules/auth/pages/Cadastro';
 import PainelAdminPage from './modules/admin/pages/PainelAdm';
 import './App.css';
 
+
 function App() {
   return (
     <BrowserRouter>
