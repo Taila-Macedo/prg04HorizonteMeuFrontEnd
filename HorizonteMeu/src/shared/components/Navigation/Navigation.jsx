@@ -3,8 +3,15 @@ import { Link } from 'react-router-dom';
 import { Search, Heart, Bell, Sparkles, Route, User } from 'lucide-react';
 import './Navigation.css'; 
 
-export function Navigation() {
+export function Navigation({ aoPesquisar }) {
   const [pesquisa, setPesquisa] = useState('');
+
+  // Adicione essa função para capturar o "Enter"
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && aoPesquisar) {
+      aoPesquisar(pesquisa);
+    }
+  };
 
   // Adicionamos a propriedade "to" nos itens para sabermos para onde ir
   const navItems = [
@@ -25,9 +32,10 @@ export function Navigation() {
       <div className="navigation-search">
         <input 
           type="text" 
-          placeholder="Pesquisar..." 
+          placeholder="Pesquisar por país..." 
           value={pesquisa}
           onChange={(e) => setPesquisa(e.target.value)}
+          onKeyDown={handleKeyDown} // <-- ADICIONE ISSO AQUI
           className="navigation-input"
         />
         <Search 

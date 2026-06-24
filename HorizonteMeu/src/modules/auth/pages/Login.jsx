@@ -1,6 +1,6 @@
 import React from 'react'
-import { useLogin } from '../hooks/useLogin' // Importa o hook contendo a lógica
-import '../styles/login.css' // Seu CSS original mantido intacto
+import { useLogin } from '../hooks/useLogin' 
+import '../styles/login.css' 
 
 function LoginPage() {
   const {
@@ -21,6 +21,7 @@ function LoginPage() {
   } = useLogin()
 
   return (
+  <div className="login-page">
     <div className="login-card">
       <div className="login-logo">
         <span className="icon">🧭</span>
@@ -28,8 +29,11 @@ function LoginPage() {
         <p>Acesso ao painel</p>
       </div>
 
-      {/* Botão Google */}
-      <button type="button" className="btn-google" onClick={handleGoogleLogin}>
+      <button
+        type="button"
+        className="btn-google"
+        onClick={handleGoogleLogin}
+      >
         <svg className="google-icon" viewBox="0 0 18 18" width="18" height="18">
           <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.61z"/>
           <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18z"/>
@@ -43,9 +47,7 @@ function LoginPage() {
         <span>ou entre com e-mail</span>
       </div>
 
-      {/* Formulário de Login */}
       <form id="form-login" noValidate onSubmit={handleSubmit}>
-        
         {/* Campo E-mail */}
         <div className="form-group">
           <input
@@ -108,7 +110,8 @@ function LoginPage() {
         </p>
       </div>
     </div>
-  )
+  </div>
+)
 }
 
 export default LoginPage

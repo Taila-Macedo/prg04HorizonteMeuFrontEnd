@@ -1,15 +1,11 @@
-body {
+.login-page {
     min-height: 100vh;
-    background-color: var(--azul-profundo);
-    background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(0, 91, 197, 0.3) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 180, 252, 0.15) 0%, transparent 50%);
-    font-family: 'Montserrat', sans-serif;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    background-color: var(--azul-profundo);
+    
 }
 
 
@@ -21,7 +17,6 @@ body {
     padding: 44px 36px;
     width: 480px; 
     max-width: 100%; 
-    
     backdrop-filter: blur(12px);
     box-shadow: 0 24px 60px rgba(0,0,0,0.5);
     animation: slideUp 0.5s ease;

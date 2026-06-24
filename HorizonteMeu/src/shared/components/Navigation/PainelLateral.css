@@ -1,0 +1,46 @@
+.painel-lateral-cards {
+  position: fixed;
+  top: 70px; /* Logo abaixo do seu Header que tem h: 70px */
+  right: 0;
+  width: 360px;
+  height: calc(100vh - 70px);
+  background-color: rgba(10, 22, 40, 0.9);
+  backdrop-filter: blur(12px);
+  border-left: 1px solid rgba(26, 58, 109, 0.4);
+  z-index: 5;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Quando NÃO estiver aberto, joga 100% pra direita pra sumir da tela de forma lisa */
+.painel-lateral-cards.escondido {
+  transform: translateX(100%);
+}
+
+.painel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.painel-header h2 {
+  color: var(--dourado-claro);
+  font-family: 'Playfair Display', serif;
+  margin: 0;
+}
+
+.btn-fechar-painel {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.btn-fechar-painel:hover {
+  opacity: 1;
+}

@@ -5,13 +5,7 @@
    --azul-claro, --dourado, --dourado-claro, --branco
    ══════════════════════════════════════════════ */
 
-/* Corrige o scroll travado herdado do Dashboard.css
-   (que define html, body { height: 100% }) */
-html, body {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
-}
+
 
 /* ── CONTAINER PRINCIPAL DA PÁGINA ── */
 .perfil-container {

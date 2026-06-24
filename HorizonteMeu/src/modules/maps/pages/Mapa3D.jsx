@@ -17,7 +17,12 @@ const oceanos = [
   { nome: "OCEANO GLACIAL ANTÁRTICO", coordinates: [0, -68] } // Posicionado na calota sul, antes da Antártica
 ];
 
-export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
+// Dicionário com as coordenadas exatas de centro e zoom para cada país pesquisado
+const COORDENADAS_PAISES = {
+  "França": { centro: [2.2137, 46.2276], escala: 650 }
+};
+
+export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto, paisFoco }) {
   // Estado que armazena os dados geográficos dos países após o carregamento da API
   const [dadosDoMapaJson, setDadosDoMapaJson] = useState({ features: [] });
   
@@ -56,6 +61,15 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
     container.addEventListener('wheel', handleWheelNative, { passive: false });
     return () => container.removeEventListener('wheel', handleWheelNative);
   }, []);
+
+  // NOVO: Hook que monitora a propriedade paisFoco para mover o mapa e aplicar zoom automaticamente
+  useEffect(() => {
+    if (paisFoco && COORDENADAS_PAISES[paisFoco]) {
+      const { centro: novoCentro, escala: novaEscala } = COORDENADAS_PAISES[paisFoco];
+      setCentro(novoCentro);
+      setEscala(novaEscala);
+    }
+  }, [paisFoco]);
 
   // Inicia o estado de arrasto e captura as coordenadas iniciais do clique do mouse
   const handleMouseDown = (e) => {
@@ -116,9 +130,7 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
         projectionConfig={{ scale: escala, center: centro }} // Injeta as configurações dinâmicas de escala e posicionamento
         style={{ width: "100%", height: "100%" }}
       >
-        {/* INVERSÃO DE CAMADA PARTE 1: Renderiza primeiro as etiquetas dos Oceanos.
-            Como no formato SVG o último elemento declarado fica por cima, se algum oceano colidir com um continente,
-            a massa de terra do país cobrirá o texto nativamente, evitando letras poluindo os mapas continentais */}
+        {/* INVERSÃO DE CAMADA PARTE 1: Renderiza primeiro as etiquetas dos Oceanos. */}
         {oceanos.map((oc, i) => {
           let tamanhoFonteOceano = escala < 300 ? 8 : (escala < 700 ? 11 : 14);
           return (
@@ -134,59 +146,45 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
           );
         })}
 
-        {/* 2. CAMADA DOS CONTINENTES E PAÍSES (Renderizada sobre a camada de fundo dos oceanos) */}
+        {/* 2. CAMADA DOS CONTINENTES E PAÍSES */}
         {dadosDoMapaJson.features.length > 0 && (
           <Geographies geography={dadosDoMapaJson}>
             {({ geographies, projection }) => {
-              // Instancia o gerador de caminhos do D3 com base no modelo de projeção do mapa plano
               const pathGenerator = geoPath().projection(projection);
 
               return geographies.map((geo) => {
                 const { NAME, NAME_LONG, POP_EST, LABEL_RANK } = geo.properties;
                 const nomeExibir = NAME || NAME_LONG;
                 
-                // --- CÁLCULO DE ALINHAMENTO GEOMÉTRICO 2D PERFEITO ---
-                // d3-geo calcula o centro exato de gravidade da projeção renderizada na tela (em pixels x, y).
-                // Convertemos o ponto de pixels de volta para coordenadas geográficas [lng, lat] para alimentar o marcador.
                 let centroPais = null;
                 try {
                   const centroidPixels = pathGenerator.centroid(geo);
-                  if (centroidPixels && !isNaN(centroidPixels[0]) && !isNaN(centroidPixels[1])) {
+                  // SEGURANÇA: Só tenta inverter a coordenada se o pixel calculado for um número válido
+                  if (centroidPixels && !isNaN(centroidPixels[0]) && !isNaN(centroidPixels[1]) && isFinite(centroidPixels[0]) && isFinite(centroidPixels[1])) {
                     centroPais = projection.invert(centroidPixels);
                   }
                 } catch (e) {
                   centroPais = null;
                 }
 
-                // --- TABELA DE TRAVAS CARTOGRÁFICAS EXCLUSIVAS (RESOLUÇÃO DE CONFLITOS DE ILHAS) ---
-                // Países fragmentados ou com ilhas distantes (como Alasca nos EUA, Svalbard na Noruega) distorcem a média aritmética.
-                // Estas travas forçam as coordenadas geográficas diretamente no coração do território principal (continente)
-                if (centroPais) {
-                  if (NAME === "United States" || NAME === "United States of America") {
-                    centroPais = [-95.7129, 37.0902]; // Centraliza estritamente na parte continental dos EUA (Kansas)
-                  } else if (NAME === "France") {
-                    centroPais = [2.2137, 46.2276];   // Fixa no centro da França continental
-                  } else if (NAME === "Canada") {
-                    centroPais = [-97.0000, 56.0000]; // Encaixa no meio das províncias canadenses principais
-                  } else if (NAME === "Norway") {
-                    centroPais = [8.4689, 60.4720];   // Evita que as ilhas árticas arrastem o nome "Norway" para o oceano
-                  }
+                // Hardcode de posições específicas caso o cálculo falhe ou mude
+                if (NAME === "United States" || NAME === "United States of America") {
+                  centroPais = [-95.7129, 37.0902]; 
+                } else if (NAME === "France") {
+                  centroPais = [2.2137, 46.2276];   
+                } else if (NAME === "Canada") {
+                  centroPais = [-97.0000, 56.0000]; 
+                } else if (NAME === "Norway") {
+                  centroPais = [8.4689, 60.4720];   
                 }
 
-                // --- SISTEMA DE DENSIDADE POPULACIONAL ADAPTATIVO (ANTI-COLISÃO) ---
-                // Controla a visibilidade dos nomes para evitar acúmulo de textos ilegíveis quando o mapa está muito distante
                 let deveraOcultar = false;
                 if (escala < 250) {
-                  // Sem zoom: Oculta territórios pequenos e exibe apenas países gigantes/potências
                   if (POP_EST < 60000000 && LABEL_RANK > 2) deveraOcultar = true;
                 } else if (escala >= 250 && escala < 600) {
-                  // Zoom intermediário: Libera países de médio porte (fronteiras médias abrem espaço)
                   if (POP_EST < 15000000 && LABEL_RANK > 4) deveraOcultar = true;
                 }
 
-                // --- ESCALAMENTO DINÂMICO DE TEXTO ---
-                // Inverte o cálculo padrão: o texto diminui de tamanho quando o mapa se afasta para caber nas fronteiras,
-                // e expande gradativamente à medida que o usuário aproxima o zoom para dar nitidez profissional
                 let tamanhoFonte = 3.5;
                 if (escala < 250) tamanhoFonte = 4;
                 else if (escala >= 250 && escala < 600) tamanhoFonte = 6;
@@ -195,7 +193,6 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
 
                 return (
                   <g key={geo.rsmKey}>
-                    {/* Renderiza a forma geográfica física de cada país */}
                     <Geography
                       geography={geo}
                       style={{
@@ -204,13 +201,18 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
                         pressed: { fill: "#0b1d33", stroke: "#cca353", strokeWidth: 0.5, outline: "none" }
                       }}
                     />
-                    {/* Renderiza o texto do rótulo por cima do país, caso passe nos filtros de densidade */}
-                    {centroPais && !isNaN(centroPais[0]) && !isNaN(centroPais[1]) && !deveraOcultar && (
+                    {/* SEGURANÇA MÁXIMA: Garante que os valores passados para as coordenadas do Marker não são NaN */}
+                    {centroPais && 
+                    !isNaN(centroPais[0]) && 
+                    !isNaN(centroPais[1]) && 
+                    isFinite(centroPais[0]) && 
+                    isFinite(centroPais[1]) && 
+                    !deveraOcultar && (
                       <Marker coordinates={centroPais}>
                         <text
                           className="country-label"
                           textAnchor="middle"
-                          y={tamanhoFonte / 3} // Alinha verticalmente o centro do texto ao marcador geométrico
+                          y={tamanhoFonte / 3}
                           style={{ fontSize: `${tamanhoFonte}px` }}
                         >
                           {nomeExibir}
@@ -224,22 +226,20 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
           </Geographies>
         )}
 
-        {/* 3. CAMADA DAS LINHAS (Arcos conectores ligando pontos de interesse pelo globo) */}
+        {/* 3. CAMADA DAS LINHAS */}
         {conexoesArcos.map((arco, i) => (
           <Line
             key={i}
             from={arco.from}
             to={arco.to}
             stroke="#ffc94a"
-            strokeWidth={escala < 400 ? 0.7 : 0.4} // Afina as linhas conforme aproxima para manter o visual limpo
-            strokeDasharray="4, 4" // Estiliza as linhas como tracejado
+            strokeWidth={escala < 400 ? 0.7 : 0.4}
+            strokeDasharray="4, 4"
           />
         ))}
 
-        {/* 4. CAMADA DOS PINOS DE INTERESSE (Pontos Turísticos e Cidades) */}
+        {/* 4. CAMADA DOS PINOS DE INTERESSE */}
         {pontosExibir.map((ponto, i) => {
-          // Garante a leitura rígida da ordem de coordenadas [Longitude, Latitude] 
-          // independentemente da estrutura do objeto recebido da API, evitando inversão de pinos
           let coords = [0, 0];
           if (ponto.coordinates && ponto.coordinates.length === 2) {
             const c0 = ponto.coordinates[0];
@@ -255,15 +255,12 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto }) {
             <Marker 
               key={i} 
               coordinates={coords}
-              onClick={() => aoSelecionarPonto && aoSelecionarPonto(ponto)} // Evento de clique para disparar ações externas (como abrir cards de informações)
+              onClick={() => aoSelecionarPonto && aoSelecionarPonto(ponto)}
             >
-              {/* Efeito visual de pulso brilhante (glow) sob o marcador */}
               <circle r={escala < 400 ? 5 : 8} fill="rgba(255, 201, 74, 0.2)" stroke="#ffc94a" strokeWidth={0.5} className="svg-pulse" />
-              {/* Ponto central indicador do marcador */}
               <circle r={escala < 400 ? 1.5 : 3} fill="#ffc94a" />
-              {/* Texto com o nome do Ponto Turístico */}
               <text
-                y={escala < 400 ? 10 : 15} // Empurra o texto para baixo para não ficar por cima do pino físico
+                y={escala < 400 ? 10 : 15}
                 className="glow-label"
                 textAnchor="middle"
                 style={{ fontSize: `${tamanhoPinoLabel}px` }}
