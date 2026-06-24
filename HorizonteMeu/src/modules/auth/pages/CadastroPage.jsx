@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCadastro } from '../hooks/useCadastro';
-import '../styles/Login.css';
+import '../styles/login.css';
 
 function CadastroPage() {
   const {
