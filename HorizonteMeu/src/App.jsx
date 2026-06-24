@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardPage from './modules/dashboard/pages/Dashboard';
 import LoginPage from './modules/auth/pages/Login';
-import CadastroPage from './modules/auth/pages/Cadastro';
+import CadastroPage from './modules/auth/pages/CadastroPage';
 import PainelAdminPage from './modules/admin/pages/PainelAdm';
 import PerfilPage from './modules/profile/pages/Perfil';
 import './App.css';
