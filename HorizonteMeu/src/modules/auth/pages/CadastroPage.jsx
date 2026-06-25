@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // CORRIGIDO: importa Link
 import { useCadastro } from '../hooks/useCadastro';
 import '../styles/login.css';
 
@@ -59,10 +60,7 @@ function CadastroPage() {
               placeholder=" "
               required
               value={nome}
-              onChange={(e) => {
-                setNome(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setNome(e.target.value); handleInputChange(); }}
               onBlur={() => setNomeTouched(true)}
               className={nomeTouched ? (isNomeValid ? 'valid' : 'invalid') : ''}
             />
@@ -79,10 +77,7 @@ function CadastroPage() {
               placeholder=" "
               required
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setEmail(e.target.value); handleInputChange(); }}
               onBlur={() => setEmailTouched(true)}
               className={emailTouched ? (isEmailValid ? 'valid' : 'invalid') : ''}
             />
@@ -99,10 +94,7 @@ function CadastroPage() {
               placeholder=" "
               required
               value={senha}
-              onChange={(e) => {
-                setSenha(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setSenha(e.target.value); handleInputChange(); }}
               onBlur={() => setSenhaTouched(true)}
               className={senhaTouched ? (isSenhaValid ? 'valid' : 'invalid') : ''}
             />
@@ -120,16 +112,9 @@ function CadastroPage() {
               required
               autoComplete="new-password"
               value={confirmaSenha}
-              onChange={(e) => {
-                setConfirmaSenha(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setConfirmaSenha(e.target.value); handleInputChange(); }}
               onBlur={() => setConfirmaSenhaTouched(true)}
-              className={
-                confirmaSenhaTouched
-                  ? (isConfirmaSenhaValid ? 'valid' : 'invalid')
-                  : ''
-              }
+              className={confirmaSenhaTouched ? (isConfirmaSenhaValid ? 'valid' : 'invalid') : ''}
             />
             <label htmlFor="confirmaSenha">Confirmar senha</label>
             <span className={`error-msg ${confirmaSenhaTouched && !isConfirmaSenhaValid ? 'visible' : ''}`}>
@@ -149,7 +134,8 @@ function CadastroPage() {
 
         <div className="login-footer">
           <p className="cadastro-link">
-            Já tem uma conta? <a href="/login">Entrar</a>
+            {/* CORRIGIDO: era <a href="/login">, causava reload da página */}
+            Já tem uma conta? <Link to="/login">Entrar</Link>
           </p>
         </div>
 

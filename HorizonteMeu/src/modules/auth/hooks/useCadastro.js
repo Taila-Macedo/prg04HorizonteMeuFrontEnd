@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // CORRIGIDO: importa useNavigate
 
 export function useCadastro() {
+  const navigate = useNavigate(); // CORRIGIDO: hook de navegação do React Router
+
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
-  
+
   const [showError, setShowError] = useState(false);
   const [nomeTouched, setNomeTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
@@ -33,8 +36,9 @@ export function useCadastro() {
     }
 
     setShowError(false);
-    // TODO: integrar com POST /usuarios (cadastrar()) quando a API estiver pronta
-    window.location.href = '/dashboard';
+    // TODO: integrar com POST /usuarios quando a API estiver pronta
+    // CORRIGIDO: useNavigate em vez de window.location.href
+    navigate('/dashboard');
   };
 
   const handleInputChange = () => {
@@ -43,7 +47,8 @@ export function useCadastro() {
 
   const handleGoogleCadastro = () => {
     // TODO: integrar com OAuth do Google futuramente
-    window.location.href = '/dashboard';
+    // CORRIGIDO: useNavigate em vez de window.location.href
+    navigate('/dashboard');
   };
 
   return {

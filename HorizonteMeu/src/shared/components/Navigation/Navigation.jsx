@@ -60,18 +60,13 @@ export const Navigation = forwardRef(function Navigation(
           />
         </Link>
 
-        <Link to="/" className="nav-action-btn" title="Sugestões IA">
-          <Sparkles size={20} />
-        </Link>
-
-        <Link to="/perfil" className="nav-action-btn" title="Perfil por enquanto">
-        <header className="nav-user-profile">
-          <Bell size={22} color="#ffffff" />
+       
+        <Link to="/perfil" className="nav-action-btn nav-notificacao" title="Notificações">
+          <Bell size={20} />
           <span className="nav-notification-badge"></span>
-        </header>
         </Link>
 
-        <Link to="/login" className="nav-user-profile" title="Login">
+        <Link to="/login" className="nav-action-btn" title="Perfil">
           <div className="nav-user-avatar">
             <User size={20} color="#ffffff" />
           </div>

@@ -8,15 +8,8 @@
   --branco:        #f4f4f4;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html,
-body,
-#root {
+body {
   width: 100%;
   min-height: 100vh;
   margin: 0;
@@ -27,4 +20,10 @@ body,
 body {
   background-color: var(--azul-profundo);
   font-family: 'Montserrat', sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
