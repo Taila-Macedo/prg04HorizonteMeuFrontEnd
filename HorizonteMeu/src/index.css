@@ -1,3 +1,13 @@
+:root {
+  --azul-profundo: #0a1628;
+  --azul-escuro:   #0d1f3c;
+  --azul-medio:    #1a3a6b;
+  --azul-claro:    #144a83;
+  --dourado:       #f0a500;
+  --dourado-claro: #ffc94a;
+  --branco:        #f4f4f4;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

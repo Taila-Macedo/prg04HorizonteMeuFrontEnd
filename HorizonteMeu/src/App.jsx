@@ -4,6 +4,7 @@ import LoginPage from './modules/auth/pages/Login';
 import CadastroPage from './modules/auth/pages/CadastroPage';
 import PainelAdminPage from './modules/admin/pages/PainelAdm';
 import PerfilPage from './modules/profile/pages/Perfil';
+import DetalhePontoPage from './modules/collections/pages/Detalheponto'
 import './App.css';
 
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/admin" element={<PainelAdminPage />} />
         <Route path="/perfil" element={<PerfilPage />} />
+        <Route path="/pontos/:id" element={<DetalhePontoPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

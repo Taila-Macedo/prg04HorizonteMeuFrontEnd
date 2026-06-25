@@ -1,70 +1,74 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Heart, Bell, Sparkles, Route, User } from 'lucide-react';
-import './Navigation.css'; 
+import './Navigation.css';
 
-export function Navigation({ aoPesquisar }) {
+// Navigation exportado com forwardRef para que o DetalhePonto
+// consiga pegar a posição do coração via ref
+export const Navigation = forwardRef(function Navigation(
+  { aoPesquisar, esconderBusca = false, favoritado = false },
+  ref
+) {
   const [pesquisa, setPesquisa] = useState('');
+  const coracaoRef = useRef(null);
 
-  // Adicione essa função para capturar o "Enter"
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && aoPesquisar) {
-      aoPesquisar(pesquisa);
+  // Expõe a posição do coração para o componente pai
+  useImperativeHandle(ref, () => ({
+    getPosicaoCoracao: () => {
+      if (!coracaoRef.current) return null;
+      return coracaoRef.current.getBoundingClientRect();
     }
-  };
+  }));
 
-  // Adicionamos a propriedade "to" nos itens para sabermos para onde ir
-  const navItems = [
-    { icon: <Route size={20} />, label: 'perfil por enquanto', id: 'roteiros', to: '/perfil' },
-    { icon: <Heart size={20} />, label: 'Favoritos', id: 'favoritos', to: '/' },
-    { icon: <Sparkles size={20} />, label: 'Sugestões IA', id: 'sugestoes', to: '/' }
-  ];
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && aoPesquisar) aoPesquisar(pesquisa);
+  };
 
   return (
     <header className="navigation-header">
-      
-      {/* Lado Esquerdo: Nome do Sistema */}
-      <span className="navigation-logo">
+
+      <Link to="/dashboard" className="navigation-logo">
         🧭 <span className="text-logo">Horizonte Meu</span>
-      </span>
+      </Link>
 
-      {/* Centro: Barra de Pesquisa */}
-      <div className="navigation-search">
-        <input 
-          type="text" 
-          placeholder="Pesquisar por país..." 
-          value={pesquisa}
-          onChange={(e) => setPesquisa(e.target.value)}
-          onKeyDown={handleKeyDown} // <-- ADICIONE ISSO AQUI
-          className="navigation-input"
-        />
-        <Search 
-          size={18} 
-          color="rgba(255, 255, 255, 0.4)" 
-          className="navigation-search-icon"
-        />
-      </div>
+      {!esconderBusca && (
+        <div className="navigation-search">
+          <input
+            type="text"
+            placeholder="Pesquisar por país..."
+            value={pesquisa}
+            onChange={(e) => setPesquisa(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="navigation-input"
+          />
+          <Search size={18} color="rgba(255, 255, 255, 0.4)" className="navigation-search-icon" />
+        </div>
+      )}
 
-      {/* Lado Direito: Notificações, Ícones Dinâmicos e Perfil */}
       <div className="navigation-actions">
-        
-        {navItems.map((item) => (
-          <Link 
-            key={item.id} 
-            to={item.to} 
-            className="nav-action-btn" 
-            title={item.label}
-          >
-            {item.icon}
-          </Link>
-        ))}
+
+        <Link to="/perfil" className="nav-action-btn" title="Perfil">
+          <Route size={20} />
+        </Link>
+
+        {/* Coração de favoritos — fica vermelho quando favoritado */}
+        <Link to="/" className="nav-action-btn" title="Favoritos" ref={coracaoRef}>
+          <Heart
+            size={20}
+            className={`nav-coracao ${favoritado ? 'nav-coracao-ativo' : ''}`}
+            fill={favoritado ? 'currentColor' : 'none'}
+          />
+        </Link>
+
+        <Link to="/" className="nav-action-btn" title="Sugestões IA">
+          <Sparkles size={20} />
+        </Link>
 
         <button className="nav-notification-button" title="Notificações">
           <Bell size={22} color="#ffffff" />
           <span className="nav-notification-badge"></span>
         </button>
 
-        {/* TRANSFORMAÇÃO AQUI: Trocamos as divs antigas por um <Link> apontando para /login */}
         <Link to="/login" className="nav-user-profile" title="Login">
           <div className="nav-user-avatar">
             <User size={20} color="#ffffff" />
@@ -74,4 +78,4 @@ export function Navigation({ aoPesquisar }) {
       </div>
     </header>
   );
-}
+});
