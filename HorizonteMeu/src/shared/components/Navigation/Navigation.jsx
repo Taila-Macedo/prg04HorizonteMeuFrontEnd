@@ -52,7 +52,7 @@ export const Navigation = forwardRef(function Navigation(
         </Link>
 
         {/* Coração de favoritos — fica vermelho quando favoritado */}
-        <Link to="/" className="nav-action-btn" title="Favoritos" ref={coracaoRef}>
+        <Link to="/favoritos" className="nav-action-btn" title="Favoritos" ref={coracaoRef}>
           <Heart
             size={20}
             className={`nav-coracao ${favoritado ? 'nav-coracao-ativo' : ''}`}
