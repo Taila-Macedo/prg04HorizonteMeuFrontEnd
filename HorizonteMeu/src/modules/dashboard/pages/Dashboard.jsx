@@ -9,8 +9,26 @@ import '../../../shared/components/Navigation/PainelLateral.css';
 
 const BASE_DADOS_MOCK = {
   france: [
-    { id: 1, titulo: "Torre Eiffel", categoria: "Monumento", descricao: "O ícone global da França.", preco: "Grátis no pátio", codigoLoc: "PARIS, FR", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500" },
-    { id: 2, titulo: "Museu do Louvre", categoria: "Cultura", descricao: "O maior museum de arte do mundo.", preco: "Ticket: €22", codigoLoc: "PARIS, FR", img: "https://images.unsplash.com/photo-1597923891164-46c29d6c28c3?w=500" }
+    { 
+      id: 1, 
+      nome: "Torre Eiffel",       // Alterado de 'titulo' para 'nome'
+      categoria: "Monumento", 
+      descricao: "O ícone global da França.", 
+      cidade: "Paris",            // Dividido do 'codigoLoc' para 'cidade'
+      pais: "França",             // Dividido do 'codigoLoc' para 'pais'
+      nota: "4.8",
+      img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500" 
+    },
+    { 
+      id: 2, 
+      nome: "Museu do Louvre",    // Alterado de 'titulo' para 'nome'
+      categoria: "Cultura", 
+      descricao: "O maior museum de arte do mundo.", 
+      cidade: "Paris",            // Dividido do 'codigoLoc' para 'cidade'
+      pais: "França",             // Dividido do 'codigoLoc' para 'pais'
+      nota: "4.8",
+      img: "https://images.unsplash.com/photo-1597923891164-46c29d6c28c3?w=500" 
+    }
   ]
 };
 

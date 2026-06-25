@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Heart } from 'lucide-react';
+import { MapPin, Heart, Star, Landmark } from 'lucide-react';
 import './Card.css';
 
 export default function SpotCard({ item }) {
@@ -22,26 +22,41 @@ export default function SpotCard({ item }) {
 
   return (
     <div className="card">
-      <img className="image" src={dados.img || dados.url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=500'} alt={dados.nome || dados.titulo} />
+      <div className="image-container">
+        <img className="image" src={dados.img} alt={dados.nome} />
+        <div className="tag-monumento">
+          <Landmark size={12} />
+          {dados.categoria}
+        </div>
+      </div>
 
       <div className="content">
+        {/* Adicionado apenas o h2 aqui para renderizar o nome do ponto */}
         <h2>{dados.nome || dados.titulo}</h2>
-        <h3>{dados.categoria}</h3>
-
-        <p>{dados.descricao}</p>
 
         <div className="details">
           <span className="item">
-            <MapPin size={16} className="material-icon" />
-            <em>{dados.cidade && dados.pais ? `${dados.cidade}, ${dados.pais}` : dados.codigoLoc}</em>
+            <MapPin size={12} className="material-icon" />
+            <em>{dados.cidade}, {dados.pais}</em>
           </span>
         </div>
 
-        <div className="buttons">
-          <button className="primary-btn" onClick={irParaDetalhe}>Ver detalhes</button>
-          <button className="icon-btn" title="Adicionar aos Favoritos">
-            <Heart size={18} />
-          </button>
+        <p>{dados.descricao}</p>
+
+        <div className="card-footer">
+          <div className="rating">
+            <Star size={14} fill="#ffb703" stroke="#ffb703" />
+            <span>{dados.nota || '4.8'}</span>
+          </div>
+
+          <div className="buttons-group">
+            <button className="primary-btn-details" onClick={irParaDetalhe}>
+              Ver detalhes
+            </button>
+            <button className="icon-btn-favorite" title="Adicionar aos Favoritos">
+              <Heart size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -47,7 +47,7 @@ export const Navigation = forwardRef(function Navigation(
 
       <div className="navigation-actions">
 
-        <Link to="/perfil" className="nav-action-btn" title="Perfil">
+        <Link to="/roteiros" className="nav-action-btn" title="Roteiros">
           <Route size={20} />
         </Link>
 
@@ -64,10 +64,12 @@ export const Navigation = forwardRef(function Navigation(
           <Sparkles size={20} />
         </Link>
 
-        <button className="nav-notification-button" title="Notificações">
+        <Link to="/perfil" className="nav-action-btn" title="Perfil por enquanto">
+        <header className="nav-user-profile">
           <Bell size={22} color="#ffffff" />
           <span className="nav-notification-badge"></span>
-        </button>
+        </header>
+        </Link>
 
         <Link to="/login" className="nav-user-profile" title="Login">
           <div className="nav-user-avatar">

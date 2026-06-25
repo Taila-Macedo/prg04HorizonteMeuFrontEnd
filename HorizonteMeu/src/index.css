@@ -25,6 +25,6 @@ body,
 }
 
 body {
-  background-color: #0a1628;
+  background-color: var(--azul-profundo);
   font-family: 'Montserrat', sans-serif;
 }
