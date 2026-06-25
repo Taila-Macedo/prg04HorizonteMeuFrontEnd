@@ -7,6 +7,7 @@ import PerfilPage from './modules/profile/pages/Perfil';
 import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import FavoritosPage from './modules/favorites/pages/Favoritos';
 import RoteirosPage from './modules/itinerary/pages/ListaRoteiros';
+import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
 import './App.css';
 
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/pontos/:id" element={<DetalhePontoPage />} />
         <Route path="/favoritos" element={<FavoritosPage />} />
         <Route path="/roteiros" element={<RoteirosPage />} />
+        <Route path="/roteiros/novo" element={<NovoRoteiroPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

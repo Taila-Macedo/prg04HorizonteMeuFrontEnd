@@ -1,24 +1,27 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {  Plus, Map, Calendar, ChevronRight,  Globe, Lock, Trash2, Route as RouteIcon } from 'lucide-react';
+import { Plus, Map, Calendar, ChevronRight, Globe, Lock, Trash2, Route as RouteIcon } from 'lucide-react';
 import { useListaRoteiros } from '../hooks/useListaRoteiros';
 import '../styles/ListaRoteiros.css';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 
 export default function ListaRoteiros() {
   const navigate = useNavigate();
-  
-  const { 
-    roteiros, 
-    loading, 
-    formatarData, 
-    deletarRoteiro 
+
+  const {
+    roteiros,
+    loading,
+    formatarData,
+    confirmandoId,
+    pedirConfirmacao,
+    confirmarDelecao,
+    cancelarDelecao,
   } = useListaRoteiros();
 
   return (
     <div className="lista-roteiros-container">
       <Navigation esconderBusca={true} />
-      
+
       <main className="lista-roteiros-content">
         <header className="lista-header">
           <div className="header-info">
@@ -39,8 +42,8 @@ export default function ListaRoteiros() {
         ) : roteiros.length > 0 ? (
           <div className="roteiros-grid">
             {roteiros.map((roteiro) => (
-              <div 
-                key={roteiro.id} 
+              <div
+                key={roteiro.id}
                 className="roteiro-card"
                 onClick={() => navigate(`/roteiros/${roteiro.id}`)}
               >
@@ -73,14 +76,24 @@ export default function ListaRoteiros() {
                       {roteiro.quantidadePontos} paradas
                     </span>
                   </div>
-                  <button 
-                    className="btn-excluir" 
-                    onClick={(e) => deletarRoteiro(roteiro.id, e)}
-                  >
-                    <Trash2 size={18} />
-                  </button>
+
+                  {/* CORRIGIDO: confirmação inline em vez de window.confirm */}
+                  {confirmandoId === roteiro.id ? (
+                    <div className="confirmacao-delecao" onClick={(e) => e.stopPropagation()}>
+                      <span>Excluir?</span>
+                      <button className="btn-confirmar-sim" onClick={(e) => confirmarDelecao(roteiro.id, e)}>Sim</button>
+                      <button className="btn-confirmar-nao" onClick={cancelarDelecao}>Não</button>
+                    </div>
+                  ) : (
+                    <button
+                      className="btn-excluir"
+                      onClick={(e) => pedirConfirmacao(roteiro.id, e)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
                 </div>
-                
+
                 <div className="card-hover-indicator">
                   <ChevronRight size={20} />
                 </div>

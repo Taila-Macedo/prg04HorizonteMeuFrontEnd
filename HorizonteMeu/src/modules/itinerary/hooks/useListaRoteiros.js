@@ -3,15 +3,17 @@ import { useState, useEffect } from 'react';
 export function useListaRoteiros() {
   const [roteiros, setRoteiros] = useState([]);
   const [loading, setLoading] = useState(true);
+  // CORRIGIDO: substitui window.confirm por estado de confirmação inline
+  const [confirmandoId, setConfirmandoId] = useState(null);
 
   useEffect(() => {
     const carregarRoteiros = async () => {
       try {
-        // Mock de dados (representando o retorno do seu Backend)
+        // TODO: GET /roteiros/usuario/{idUsuario}
         const dadosMock = [
           {
             id: 1,
-            titulo: "FÉRIAS DE VERÃO NA EUROPA",
+            titulo: "Férias de verão na Europa",
             descricao: "Roteiro passando por Paris, Amsterdã e Berlim.",
             dataViagem: "2025-07-15",
             publico: true,
@@ -19,14 +21,14 @@ export function useListaRoteiros() {
           },
           {
             id: 2,
-            titulo: "EXPLORANDO O NORDESTE",
+            titulo: "Explorando o Nordeste",
             descricao: "Melhores praias e pontos históricos de Salvador e Recife.",
             dataViagem: "2025-12-20",
             publico: false,
             quantidadePontos: 5
           }
         ];
-        
+
         setTimeout(() => {
           setRoteiros(dadosMock);
           setLoading(false);
@@ -46,17 +48,33 @@ export function useListaRoteiros() {
     return data.toLocaleDateString('pt-BR');
   };
 
-  const deletarRoteiro = (id, e) => {
-    e.stopPropagation(); 
-    if (window.confirm("Tem certeza que deseja excluir este roteiro?")) {
-      setRoteiros(prev => prev.filter(r => r.id !== id));
-    }
+  // Abre a confirmação inline para o roteiro clicado
+  const pedirConfirmacao = (id, e) => {
+    e.stopPropagation();
+    setConfirmandoId(id);
+  };
+
+  // Confirma e deleta
+  const confirmarDelecao = (id, e) => {
+    e.stopPropagation();
+    // TODO: DELETE /roteiros/{id}
+    setRoteiros(prev => prev.filter(r => r.id !== id));
+    setConfirmandoId(null);
+  };
+
+  // Cancela sem deletar
+  const cancelarDelecao = (e) => {
+    e.stopPropagation();
+    setConfirmandoId(null);
   };
 
   return {
     roteiros,
     loading,
     formatarData,
-    deletarRoteiro
+    confirmandoId,
+    pedirConfirmacao,
+    confirmarDelecao,
+    cancelarDelecao,
   };
 }
