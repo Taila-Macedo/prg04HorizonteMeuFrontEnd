@@ -4,7 +4,7 @@ import LoginPage from './modules/auth/pages/Login';
 import CadastroPage from './modules/auth/pages/CadastroPage';
 import PainelAdminPage from './modules/admin/pages/PainelAdm';
 import PerfilPage from './modules/profile/pages/Perfil';
-import DetalhePontoPage from './modules/collections/pages/Detalheponto'
+import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import './App.css';
 
 
