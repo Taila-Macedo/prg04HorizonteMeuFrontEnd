@@ -10,7 +10,8 @@ import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import FavoritosPage from './modules/favorites/pages/Favoritos';
 import RoteirosPage from './modules/itinerary/pages/ListaRoteiros';
 import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
-import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro'; // ← NOVO
+import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro';
+import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro'; 
 import './App.css';
 
 function App() {
@@ -23,13 +24,14 @@ function App() {
         <Route path="/cadastro" element={<CadastroPage />} />
 
         {/* Rotas protegidas — exigem login */}
-        <Route path="/dashboard"      element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-        <Route path="/perfil"         element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
-        <Route path="/pontos/:id"     element={<PrivateRoute><DetalhePontoPage /></PrivateRoute>} />
-        <Route path="/favoritos"      element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
-        <Route path="/roteiros"       element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
-        <Route path="/roteiros/novo"  element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
-        <Route path="/roteiros/:id"   element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} /> {/* ← NOVO */}
+        <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/perfil"              element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
+        <Route path="/pontos/:id"          element={<PrivateRoute><DetalhePontoPage /></PrivateRoute>} />
+        <Route path="/favoritos"           element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
+        <Route path="/roteiros"            element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
+        <Route path="/roteiros/novo"       element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
+        <Route path="/roteiros/:id"        element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} />
+        <Route path="/roteiros/:id/editar" element={<PrivateRoute><EditarRoteiroPage /></PrivateRoute>} /> {/* ← NOVO */}
 
         {/* Rota de admin — exige login E perfil ADMINISTRADOR */}
         <Route path="/admin" element={<PrivateRoute><PainelAdminPage /></PrivateRoute>} />
