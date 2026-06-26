@@ -4,7 +4,7 @@ import PrivateRoute from './shared/components/PrivateRoute/PrivateRoute';
 import DashboardPage from './modules/dashboard/pages/Dashboard';
 import LoginPage from './modules/auth/pages/Login';
 import CadastroPage from './modules/auth/pages/CadastroPage';
-import PainelAdminPage from './modules/admin/pages/PainelAdm';
+import PainelAdminPage from './modules/admin/pages/AdminDashboard';
 import PerfilPage from './modules/profile/pages/Perfil';
 import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import FavoritosPage from './modules/favorites/pages/Favoritos';
@@ -30,7 +30,7 @@ function App() {
         <Route path="/roteiros/novo"  element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
 
         {/* Rota de admin — exige login E perfil ADMINISTRADOR */}
-        <Route path="/admin" element={<PrivateRoute apenasAdmin><PainelAdminPage /></PrivateRoute>} />
+        <Route path="/admin" element={<PrivateRoute><PainelAdminPage /></PrivateRoute>} />
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

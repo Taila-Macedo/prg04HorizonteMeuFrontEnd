@@ -1,0 +1,58 @@
+:root {
+  --cinza-claro: #e0e0e0;
+  --cinza-escuro: #666666;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+.section-card {
+  background: var(--azul-medio);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title svg {
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.section-action {
+  font-size: 12px;
+  color: var(--dourado-claro);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.section-action:hover {
+  color: var(--dourado);
+  gap: 6px;
+}
+
+.section-content {
+  padding: 0;
+}

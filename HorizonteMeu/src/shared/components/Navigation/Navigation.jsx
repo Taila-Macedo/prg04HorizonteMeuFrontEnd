@@ -66,7 +66,7 @@ export const Navigation = forwardRef(function Navigation(
           <span className="nav-notification-badge"></span>
         </Link>
 
-        <Link to="/login" className="nav-action-btn" title="Perfil">
+        <Link to="/admin" className="nav-action-btn" title="Painel de Admin">
           <div className="nav-user-avatar">
             <User size={20} color="#ffffff" />
           </div>

@@ -1,0 +1,128 @@
+:root {
+  --cinza-claro: #e0e0e0;
+  --cinza-escuro: #666666;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+.photo-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.photo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.photo-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.photo-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--branco);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  vertical-align: middle;
+}
+
+.photo-table tr:last-child td {
+  border-bottom: none;
+}
+
+.photo-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.photo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.photo-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.photo-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.photo-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--branco);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photo-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.photo-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-action {
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.btn-action.approve {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.btn-action.approve:hover {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.btn-action.reject {
+  color: #ff6464;
+  border-color: rgba(255, 100, 100, 0.3);
+}
+
+.btn-action.reject:hover {
+  background: rgba(255, 100, 100, 0.1);
+  border-color: rgba(255, 100, 100, 0.6);
+}
+
+.btn-action svg {
+  flex-shrink: 0;
+}

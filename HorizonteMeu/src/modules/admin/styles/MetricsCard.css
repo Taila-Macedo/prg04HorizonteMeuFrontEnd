@@ -1,0 +1,69 @@
+:root {
+  --cinza-claro: #e0e0e0;
+  --cinza-escuro: #666666;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+.metric-card {
+  background: var(--azul-medio);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.metric-card:hover {
+  border-color: rgba(255, 201, 74, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 201, 74, 0.1);
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--branco);
+  line-height: 1;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.metric-sub {
+  font-size: 11px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.metric-sub.up {
+  color: #4ade80;
+}
+
+.metric-sub.down {
+  color: #ff6464;
+}
+
+.metric-sub.neutral {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.metric-sub.warning {
+  color: var(--dourado-claro);
+}
+
+.metric-sub.alert {
+  color: #ff6464;
+}
+
+.metric-sub svg {
+  flex-shrink: 0;
+}
