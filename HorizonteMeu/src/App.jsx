@@ -10,6 +10,7 @@ import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import FavoritosPage from './modules/favorites/pages/Favoritos';
 import RoteirosPage from './modules/itinerary/pages/ListaRoteiros';
 import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
+import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro'; // ← NOVO
 import './App.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/favoritos"      element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
         <Route path="/roteiros"       element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
         <Route path="/roteiros/novo"  element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
+        <Route path="/roteiros/:id"   element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} /> {/* ← NOVO */}
 
         {/* Rota de admin — exige login E perfil ADMINISTRADOR */}
         <Route path="/admin" element={<PrivateRoute><PainelAdminPage /></PrivateRoute>} />
