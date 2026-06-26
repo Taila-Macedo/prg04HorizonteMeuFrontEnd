@@ -2,39 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, Flag, X, ImagePlus } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
+import { PONTOS_MOCK, FOTOS_MOCK, COMENTARIOS_MOCK, CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
 import '../styles/DetalhePonto.css';
 
-const PONTO_MOCK = {
-  id: 1,
-  nome: 'Torre Eiffel',
-  descricao: 'Um dos monumentos mais famosos do mundo, a Torre Eiffel foi construída em 1889 como o arco de entrada para a Exposição Universal de Paris. Com seus 330 metros de altura, oferece uma vista deslumbrante de toda a cidade.',
-  cidade: 'Paris',
-  pais: 'França',
-  latitude: 48.8584,
-  longitude: 2.2945,
-  notaMedia: 4.8,
-  categoria: 'MONUMENTO',
-};
-
-const FOTOS_MOCK = [
-  { id: 1, url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800' },
-  { id: 2, url: 'https://images.unsplash.com/photo-1543349689-9a4d426bee8e?w=800' },
-  { id: 3, url: 'https://images.unsplash.com/photo-1507833423370-a126b89d394b?w=800' },
-];
-
-const COMENTARIOS_MOCK = [
-  { id: 1, usuario: { nome: 'Ana Lima' }, texto: 'Lugar incrível! A vista do topo é de tirar o fôlego.', nota: 5, curtidas: 12, fotoUrl: null },
-  { id: 2, usuario: { nome: 'Carlos Souza' }, texto: 'Vale muito a pena visitar. Cheguei cedo para evitar filas e foi perfeito.', nota: 4, curtidas: 7, fotoUrl: 'https://images.unsplash.com/photo-1543349689-9a4d426bee8e?w=400' },
-  { id: 3, usuario: { nome: 'Mariana Costa' }, texto: 'Experiência única! O pôr do sol visto de lá é inesquecível.', nota: 5, curtidas: 20, fotoUrl: null },
-];
-
-const CATEGORIA_LABEL = {
-  PRAIA: '🏖️ Praia',
-  MUSEU: '🏛️ Museu',
-  MONTANHA: '⛰️ Montanha',
-  MONUMENTO: '🗿 Monumento',
-  PARQUE: '🌳 Parque',
-};
+// Achata todos os pontos de todos os países em um único objeto indexado por id
+const PONTOS_POR_ID = Object.values(PONTOS_MOCK)
+  .flat()
+  .reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
 
 function Estrelas({ nota, tamanho = 16 }) {
   return (
@@ -55,8 +29,8 @@ export default function DetalhePonto() {
   const { id } = useParams();
   const navigate = useNavigate();
   const comentarioFotoRef = useRef(null);
-  const navRef = useRef(null);         // ref para o Navigation (pegar posição do coração)
-  const btnFavoritarRef = useRef(null); // ref para o botão favoritar (ponto de partida)
+  const navRef = useRef(null);
+  const btnFavoritarRef = useRef(null);
 
   const [ponto, setPonto] = useState(null);
   const [fotos, setFotos] = useState([]);
@@ -64,19 +38,22 @@ export default function DetalhePonto() {
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [favoritado, setFavoritado] = useState(false);
   const [carregando, setCarregando] = useState(true);
-
-  // Animação do avião
-  const [avioes, setAvioes] = useState([]); // lista de aviões voando
+  const [avioes, setAvioes] = useState([]);
 
   const [denunciaModal, setDenunciaModal] = useState({ aberto: false, comentarioId: null });
   const [motivoDenuncia, setMotivoDenuncia] = useState('');
   const [novoComentario, setNovoComentario] = useState({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
 
   useEffect(() => {
+    // TODO: GET /pontos-turisticos/{id}, GET /fotos/ponto/{id}, GET /comentarios/ponto/{id}
     setTimeout(() => {
-      setPonto(PONTO_MOCK);
-      setFotos(FOTOS_MOCK);
-      setComentarios(COMENTARIOS_MOCK);
+      const pontoEncontrado = PONTOS_POR_ID[Number(id)];
+      const fotosEncontradas = FOTOS_MOCK[Number(id)] ?? FOTOS_MOCK[1];
+      const comentariosEncontrados = COMENTARIOS_MOCK[Number(id)] ?? COMENTARIOS_MOCK[1];
+
+      setPonto(pontoEncontrado ?? null);
+      setFotos(fotosEncontradas);
+      setComentarios(comentariosEncontrados);
       setCarregando(false);
     }, 400);
   }, [id]);
@@ -88,12 +65,10 @@ export default function DetalhePonto() {
 
   const toggleFavorito = () => {
     if (favoritado) {
-      // Só desfavorita, sem animação
       setFavoritado(false);
       return;
     }
 
-    // Pega posições de origem (botão) e destino (coração no nav)
     const origem = btnFavoritarRef.current?.getBoundingClientRect();
     const destino = navRef.current?.getPosicaoCoracao();
 
@@ -107,10 +82,8 @@ export default function DetalhePonto() {
       };
       setAvioes((prev) => [...prev, novoAviao]);
 
-      // Remove o avião após a animação terminar (1.2s)
       setTimeout(() => {
         setAvioes((prev) => prev.filter((a) => a.id !== novoAviao.id));
-        // Favorita e dispara pulso no coração do nav
         setFavoritado(true);
       }, 1100);
     } else {
@@ -176,14 +149,12 @@ export default function DetalhePonto() {
   return (
     <div className="detalhe-container">
 
-      {/* Aviões voando — renderizados fora do fluxo, sobre tudo */}
       {avioes.map((aviao) => (
         <AviaoAnimado key={aviao.id} {...aviao} />
       ))}
 
       <Navigation ref={navRef} esconderBusca favoritado={favoritado} />
 
-      {/* Hero */}
       <div className="detalhe-hero">
         {fotos.length > 0 ? (
           <>
@@ -209,11 +180,10 @@ export default function DetalhePonto() {
           </div>
         )}
         <span className="detalhe-categoria-badge">
-          {CATEGORIA_LABEL[ponto.categoria] || ponto.categoria}
+          {CATEGORIA_LABEL[ponto.categoriaEnum] || ponto.categoria}
         </span>
       </div>
 
-      {/* Conteúdo principal */}
       <div className="detalhe-main">
 
         <div className="detalhe-cabecalho">
@@ -230,7 +200,6 @@ export default function DetalhePonto() {
           </div>
         </div>
 
-        {/* Botões de ação */}
         <div className="detalhe-acoes">
           <button
             ref={btnFavoritarRef}
@@ -350,7 +319,6 @@ export default function DetalhePonto() {
         </div>
       </div>
 
-      {/* Modal de denúncia */}
       {denunciaModal.aberto && (
         <div className="modal-overlay" onClick={() => setDenunciaModal({ aberto: false, comentarioId: null })}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -386,15 +354,11 @@ export default function DetalhePonto() {
   );
 }
 
-// ── Componente do avião animado ──
-// Cria um elemento fixo na tela que voa em arco do botão até o coração
 function AviaoAnimado({ x, y, destinoX, destinoY }) {
   const dx = destinoX - x;
   const dy = destinoY - y;
-  const distancia = Math.sqrt(dx * dx + dy * dy);
   const angulo = Math.atan2(dy, dx) * (180 / Math.PI);
 
-  // CSS custom properties para a animação
   const estilo = {
     '--dx': `${dx}px`,
     '--dy': `${dy}px`,
