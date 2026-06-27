@@ -1,0 +1,558 @@
+.cfg-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--azul-profundo);
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(0, 91, 197, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(0, 60, 140, 0.15) 0%, transparent 55%);
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+}
+
+/* ── SIDEBAR ── */
+.cfg-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: rgba(1, 22, 65, 0.7);
+  border-right: 1px solid rgba(0, 180, 252, 0.1);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.cfg-voltar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: color 0.2s;
+}
+
+.cfg-voltar:hover { color: rgba(255, 255, 255, 0.85); }
+
+.cfg-sidebar-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin: 0 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 180, 252, 0.12);
+}
+
+/* Nav items */
+.cfg-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.cfg-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.cfg-nav-item:hover {
+  background: rgba(0, 180, 252, 0.08);
+  color: #ffffff;
+}
+
+.cfg-nav-item.ativo {
+  background: rgba(26, 58, 107, 0.8);
+  border: 1px solid rgba(0, 180, 252, 0.2);
+  color: #ffffff;
+}
+
+.cfg-nav-item.perigo { color: rgba(255, 107, 107, 0.65); }
+.cfg-nav-item.perigo:hover,
+.cfg-nav-item.perigo.ativo { color: #ff6b6b; background: rgba(255, 107, 107, 0.08); border-color: rgba(255, 107, 107, 0.2); }
+
+/* Sair */
+.cfg-sair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.cfg-sair:hover {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── MAIN ── */
+.cfg-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 32px;
+  height: 100vh;
+}
+
+.cfg-main-inner {
+  max-width: 640px;
+}
+
+/* ── SEÇÃO HEADER ── */
+.cfg-secao-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cfg-secao-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+
+.cfg-secao-header p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.cfg-secao-header-perigo h1 { color: #ff6b6b; }
+
+/* ── CARD ── */
+.cfg-card {
+  background: rgba(1, 38, 119, 0.4);
+  border: 1px solid rgba(0, 180, 252, 0.15);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.cfg-card-perigo {
+  border-color: rgba(255, 107, 107, 0.2);
+}
+
+.cfg-card-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 24px;
+}
+
+.cfg-card-subtitulo {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: -16px 0 20px;
+}
+
+/* ── AVATAR ── */
+.cfg-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.cfg-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(26, 58, 107, 0.6);
+  border: 3px solid rgba(0, 180, 252, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cfg-alterar-foto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--azul-claro);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cfg-alterar-foto:hover { color: var(--dourado); }
+
+/* ── CAMPOS ── */
+.cfg-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cfg-campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cfg-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.cfg-input,
+.cfg-textarea {
+  background: rgba(0, 20, 73, 0.6);
+  border: 1.5px solid rgba(0, 91, 197, 0.4);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cfg-input:focus,
+.cfg-textarea:focus {
+  border-color: var(--azul-claro);
+  box-shadow: 0 0 0 3px rgba(0, 180, 252, 0.12);
+}
+
+.cfg-textarea { resize: vertical; min-height: 80px; }
+
+.cfg-contador {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: right;
+}
+
+.cfg-erro {
+  font-size: 0.75rem;
+  color: #ff6b6b;
+}
+
+/* ── CAMPO SENHA ── */
+.cfg-input-senha-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cfg-input-icone {
+  position: absolute;
+  left: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.cfg-input-com-icone {
+  padding-left: 38px;
+  padding-right: 40px;
+}
+
+.cfg-toggle-visibilidade {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.cfg-toggle-visibilidade:hover { color: rgba(255, 255, 255, 0.7); }
+
+/* Força da senha */
+.cfg-forca-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cfg-forca-barra {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.cfg-forca-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+.cfg-forca-fill.cfg-forca-fraca { width: 33%; background: #ff6b6b; }
+.cfg-forca-fill.cfg-forca-media { width: 66%; background: #f0a500; }
+.cfg-forca-fill.cfg-forca-forte { width: 100%; background: #51cf66; }
+
+.cfg-forca-label { font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+.cfg-forca-label.cfg-forca-fraca { color: #ff6b6b; }
+.cfg-forca-label.cfg-forca-media { color: #f0a500; }
+.cfg-forca-label.cfg-forca-forte { color: #51cf66; }
+
+.cfg-dica-senha {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0;
+}
+
+/* ── NOTIFICAÇÕES ── */
+.cfg-notif-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cfg-notif-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cfg-notif-item:last-child { border-bottom: none; }
+
+.cfg-notif-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+
+.cfg-notif-icone {
+  color: var(--dourado);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cfg-notif-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cfg-notif-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Toggle switch */
+.cfg-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.25s;
+}
+
+.cfg-toggle.ativo { background: #3b82f6; }
+
+.cfg-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.25s;
+}
+
+.cfg-toggle.ativo .cfg-toggle-thumb { transform: translateX(20px); }
+
+/* ── EXCLUIR ── */
+.cfg-excluir-aviso {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 12px;
+}
+
+.cfg-excluir-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cfg-excluir-lista li {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cfg-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cfg-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ff6b6b;
+  cursor: pointer;
+}
+
+/* ── AÇÕES ── */
+.cfg-acoes {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 180, 252, 0.1);
+}
+
+.cfg-acoes-senha {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cfg-btn-salvar {
+  padding: 11px 28px;
+  border-radius: 8px;
+  border: none;
+  background: #3b82f6;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.cfg-btn-salvar:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.cfg-btn-salvar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cfg-btn-cancelar {
+  padding: 11px 24px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cfg-btn-cancelar:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+.cfg-btn-excluir {
+  padding: 11px 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 107, 107, 0.85);
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cfg-btn-excluir:hover:not(:disabled) { background: #ff6b6b; transform: translateY(-1px); }
+.cfg-btn-excluir:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── TOAST ── */
+.cfg-toast {
+  margin-top: 16px;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.cfg-toast-sucesso {
+  background: rgba(81, 207, 102, 0.12);
+  border: 1px solid rgba(81, 207, 102, 0.3);
+  color: #51cf66;
+}
+
+.cfg-toast-erro {
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 768px) {
+  .cfg-container { flex-direction: column; }
+
+  .cfg-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 180, 252, 0.1);
+    padding: 20px 16px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .cfg-sidebar-titulo { display: none; }
+  .cfg-voltar { width: 100%; margin-bottom: 8px; }
+  .cfg-nav { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .cfg-nav-item { padding: 8px 12px; font-size: 0.78rem; }
+  .cfg-sair { margin-top: 0; margin-left: auto; }
+
+  .cfg-main { padding: 24px 16px; }
+  .cfg-acoes-senha { flex-direction: column; }
+  .cfg-btn-cancelar, .cfg-btn-salvar, .cfg-btn-excluir { width: 100%; text-align: center; }
+}

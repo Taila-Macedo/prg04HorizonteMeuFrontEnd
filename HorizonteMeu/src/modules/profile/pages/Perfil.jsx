@@ -1,6 +1,6 @@
 // src/modules/profile/pages/Perfil.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plane, Map, Heart as HeartIcon, Settings, MapPin, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import MeuCardDeTeste from '../../../shared/components/Navigation/Card';
@@ -8,6 +8,7 @@ import '../styles/Perfil.css';
 
 export default function Perfil() {
   const { usuario } = useAuth();
+  const navigate = useNavigate();
   const [abaAtiva, setAbaAtiva] = useState('favoritos');
 
   if (!usuario) return null;
@@ -35,7 +36,7 @@ export default function Perfil() {
           </div>
 
           <div className="perfil-actions">
-            <button className="btn-configuracoes">
+            <button className="btn-configuracoes" onClick={() => navigate('/configuracoes')}>
               <Settings size={15} /> Configurações
             </button>
           </div>

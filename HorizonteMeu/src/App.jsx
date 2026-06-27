@@ -7,6 +7,7 @@ import CadastroPage from './modules/auth/pages/CadastroPage';
 import RecuperarSenhaPage from './modules/auth/pages/RecuperarSenhaPage';
 import PainelAdminPage from './modules/admin/pages/AdminDashboard';
 import PerfilPage from './modules/profile/pages/Perfil';
+import ConfiguracoesPage from './modules/settings/pages/Configuracoes';
 import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
 import ListaPontosPage from './modules/collections/pages/ListaPontos';
 import AdicionarPontoPage from './modules/collections/pages/AdicionarPonto';
@@ -31,6 +32,7 @@ function App() {
         {/* Rotas protegidas — exigem login */}
         <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/perfil"              element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
+        <Route path="/configuracoes"       element={<PrivateRoute><ConfiguracoesPage /></PrivateRoute>} />
         <Route path="/pontos"              element={<PrivateRoute><ListaPontosPage /></PrivateRoute>} />
         <Route path="/pontos/novo"         element={<PrivateRoute><AdicionarPontoPage /></PrivateRoute>} />
         <Route path="/pontos/:id"          element={<PrivateRoute><DetalhePontoPage /></PrivateRoute>} />
