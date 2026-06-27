@@ -7,6 +7,9 @@ import CadastroPage from './modules/auth/pages/CadastroPage';
 import PainelAdminPage from './modules/admin/pages/AdminDashboard';
 import PerfilPage from './modules/profile/pages/Perfil';
 import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
+import ListaPontosPage from './modules/collections/pages/ListaPontos';
+import AdicionarPontoPage from './modules/collections/pages/AdicionarPonto';
+import EditarPontoPage from './modules/collections/pages/EditarPonto';
 import FavoritosPage from './modules/favorites/pages/Favoritos';
 import RoteirosPage from './modules/itinerary/pages/ListaRoteiros';
 import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
@@ -26,7 +29,10 @@ function App() {
         {/* Rotas protegidas — exigem login */}
         <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/perfil"              element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
+        <Route path="/pontos"              element={<PrivateRoute><ListaPontosPage /></PrivateRoute>} />
+        <Route path="/pontos/novo"         element={<PrivateRoute><AdicionarPontoPage /></PrivateRoute>} />
         <Route path="/pontos/:id"          element={<PrivateRoute><DetalhePontoPage /></PrivateRoute>} />
+        <Route path="/pontos/:id/editar"   element={<PrivateRoute><EditarPontoPage /></PrivateRoute>} />
         <Route path="/favoritos"           element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
         <Route path="/roteiros"            element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
         <Route path="/roteiros/novo"       element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />

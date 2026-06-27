@@ -1,0 +1,149 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Star, Search, SlidersHorizontal, Plus } from 'lucide-react';
+import { Navigation } from '../../../shared/components/Navigation/Navigation';
+import { useListaPontos } from '../hooks/useListaPontos';
+import { useAuth } from '../../../shared/contexts/AuthContext';
+import '../styles/ListaPontos.css';
+
+const CATEGORIAS = [
+  { key: 'TODOS',     label: 'Todos'      },
+  { key: 'PRAIA',     label: '🏖️ Praia'   },
+  { key: 'MUSEU',     label: '🏛️ Museu'   },
+  { key: 'MONTANHA',  label: '⛰️ Montanha' },
+  { key: 'MONUMENTO', label: '🗿 Monumento'},
+  { key: 'PARQUE',    label: '🌳 Parque'  },
+];
+
+function Estrelas({ nota }) {
+  return (
+    <div className="lp-estrelas">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star
+          key={n}
+          size={12}
+          className={n <= Math.round(nota) ? 'estrela-ativa' : 'estrela-vazia'}
+          fill={n <= Math.round(nota) ? 'currentColor' : 'none'}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function ListaPontos() {
+  const navigate = useNavigate();
+  const { usuario } = useAuth();
+  const isAdmin = usuario?.perfil === 'ADMINISTRADOR';
+
+  const {
+    pontos,
+    loading,
+    busca,
+    setBusca,
+    categoriaAtiva,
+    setCategoriaAtiva,
+  } = useListaPontos();
+
+  return (
+    <div className="lp-container">
+      <Navigation esconderBusca />
+
+      <main className="lp-content">
+        <header className="lp-header">
+          <div className="lp-header-info">
+            <h1>Explorar Pontos</h1>
+            <p>Descubra destinos incríveis ao redor do mundo.</p>
+          </div>
+          {isAdmin && (
+            <button className="btn-novo-ponto" onClick={() => navigate('/pontos/novo')}>
+              <Plus size={18} />
+              Novo Ponto
+            </button>
+          )}
+        </header>
+
+        {/* Barra de busca */}
+        <div className="lp-busca-wrapper">
+          <Search size={16} className="lp-busca-icone" />
+          <input
+            className="lp-busca-input"
+            type="text"
+            placeholder="Buscar por nome, cidade ou país..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+          {busca && (
+            <button className="lp-busca-limpar" onClick={() => setBusca('')}>✕</button>
+          )}
+        </div>
+
+        {/* Filtros de categoria */}
+        <div className="lp-filtros">
+          <SlidersHorizontal size={14} className="lp-filtros-icone" />
+          {CATEGORIAS.map((cat) => (
+            <button
+              key={cat.key}
+              className={`lp-filtro-btn ${categoriaAtiva === cat.key ? 'ativo' : ''}`}
+              onClick={() => setCategoriaAtiva(cat.key)}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Estado de loading */}
+        {loading ? (
+          <div className="lp-loading">
+            <div className="lp-spinner" />
+            <p>Carregando pontos turísticos...</p>
+          </div>
+        ) : pontos.length === 0 ? (
+          <div className="lp-vazio">
+            <MapPin size={40} />
+            <p>Nenhum ponto encontrado para sua busca.</p>
+            <button className="btn-limpar-filtros" onClick={() => { setBusca(''); setCategoriaAtiva('TODOS'); }}>
+              Limpar filtros
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="lp-contagem">{pontos.length} ponto{pontos.length !== 1 ? 's' : ''} encontrado{pontos.length !== 1 ? 's' : ''}</p>
+            <div className="lp-grid">
+              {pontos.map((ponto) => (
+                <div
+                  key={ponto.id}
+                  className="lp-card"
+                  onClick={() => navigate(`/pontos/${ponto.id}`)}
+                >
+                  <div className="lp-card-img-wrapper">
+                    {ponto.img ? (
+                      <img src={ponto.img} alt={ponto.nome} className="lp-card-img" />
+                    ) : (
+                      <div className="lp-card-img-vazio">
+                        <MapPin size={28} />
+                      </div>
+                    )}
+                    <span className="lp-card-categoria">{ponto.categoria}</span>
+                  </div>
+
+                  <div className="lp-card-body">
+                    <h3 className="lp-card-nome">{ponto.nome}</h3>
+                    <div className="lp-card-local">
+                      <MapPin size={12} />
+                      <span>{ponto.cidade}, {ponto.pais}</span>
+                    </div>
+                    <p className="lp-card-descricao">{ponto.descricao}</p>
+                    <div className="lp-card-footer">
+                      <Estrelas nota={ponto.notaMedia} />
+                      <span className="lp-card-nota">{ponto.notaMedia?.toFixed(1)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+}

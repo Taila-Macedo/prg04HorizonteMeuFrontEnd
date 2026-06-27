@@ -1,6 +1,6 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, Bell, Sparkles, Route, User } from 'lucide-react';
+import { Search, Heart, Bell, Sparkles, Route, User, MapPin } from 'lucide-react';
 import './Navigation.css';
 
 // Navigation exportado com forwardRef para que o DetalhePonto
@@ -46,6 +46,10 @@ export const Navigation = forwardRef(function Navigation(
       )}
 
       <div className="navigation-actions">
+
+        <Link to="/pontos" className="nav-action-btn" title="Explorar Pontos">
+          <MapPin size={20} />
+        </Link>
 
         <Link to="/roteiros" className="nav-action-btn" title="Roteiros">
           <Route size={20} />
