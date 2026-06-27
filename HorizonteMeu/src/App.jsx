@@ -4,6 +4,7 @@ import PrivateRoute from './shared/components/PrivateRoute/PrivateRoute';
 import DashboardPage from './modules/dashboard/pages/Dashboard';
 import LoginPage from './modules/auth/pages/Login';
 import CadastroPage from './modules/auth/pages/CadastroPage';
+import RecuperarSenhaPage from './modules/auth/pages/RecuperarSenhaPage';
 import PainelAdminPage from './modules/admin/pages/AdminDashboard';
 import PerfilPage from './modules/profile/pages/Perfil';
 import DetalhePontoPage from './modules/collections/pages/DetalhePonto';
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/cadastro" element={<CadastroPage />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
 
         {/* Rotas protegidas — exigem login */}
         <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />

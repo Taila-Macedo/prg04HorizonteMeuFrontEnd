@@ -105,7 +105,12 @@ function LoginPage() {
         </form>
 
         <div className="login-footer">
-          <a href="#">Esqueceu a senha?</a>
+          <Link to="/recuperar-senha" style={{ color: 'var(--azul-claro)', textDecoration: 'none', fontSize: '0.85rem' }}
+            onMouseOver={e => e.target.style.color='var(--dourado)'}
+            onMouseOut={e => e.target.style.color='var(--azul-claro)'}
+          >
+            Esqueceu a senha?
+          </Link>
           <p className="cadastro-link">
             {/* CORRIGIDO: era <a href="/cadastro">, causava reload da página */}
             Ainda não tem conta? <Link to="/cadastro">Cadastre-se</Link>
