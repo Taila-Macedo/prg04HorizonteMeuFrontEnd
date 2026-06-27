@@ -1,13 +1,13 @@
 :root {
   --azul-profundo: #0a1628;
-  --azul-escuro: #0d1f3c;
-  --azul-medio: #1a3a6b;
-  --azul-claro: #144a83;
-  --dourado: #f0a500;
+  --azul-escuro:   #0d1f3c;
+  --azul-medio:    #1a3a6b;
+  --azul-claro:    #144a83;
+  --dourado:       #f0a500;
   --dourado-claro: #ffc94a;
-  --branco: #f4f4f4;
-  --cinza-claro: #e0e0e0;
-  --cinza-escuro: #666666;
+  --branco:        #f4f4f4;
+  --cinza-claro:   #e0e0e0;
+  --cinza-escuro:  #666666;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
 }
@@ -24,6 +24,7 @@ body {
   color: var(--branco);
 }
 
+/* ── Desktop: grid com sidebar lateral ───────────────────────────────────── */
 .admin-shell {
   width: 100vw;
   height: 100vh;
@@ -70,13 +71,13 @@ body {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
   gap: 24px;
 }
 
@@ -94,57 +95,18 @@ body {
   font-size: 14px;
 }
 
-/* Scrollbar customizado */
-.admin-main::-webkit-scrollbar {
-  width: 8px;
-}
-
-.admin-main::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* Scrollbar do conteúdo principal */
+.admin-main::-webkit-scrollbar { width: 8px; }
+.admin-main::-webkit-scrollbar-track { background: transparent; }
 .admin-main::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
-
 .admin-main::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Responsividade */
-@media (max-width: 1200px) {
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-shell {
-    grid-template-columns: 1fr;
-    grid-template-rows: 52px auto 1fr;
-  }
-
-  .admin-main {
-    grid-column: 1;
-    grid-row: 3;
-    padding: 16px;
-  }
-
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Estados de Loading e Erro */
+/* Loading e Erro */
 .loading-message,
 .error-message {
   display: flex;
@@ -165,4 +127,93 @@ body {
   color: #ff6464;
   background: rgba(255, 100, 100, 0.05);
   border-color: rgba(255, 100, 100, 0.2);
+}
+
+/* ── Tablet: simplifica grid mas mantém sidebar lateral ──────────────────── */
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Mobile: sidebar some do grid, barra de nav vai para baixo ───────────── */
+@media (max-width: 768px) {
+  .admin-shell {
+    /* Sem coluna lateral — conteúdo ocupa a largura toda */
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px 1fr;
+    /* A sidebar é fixed no bottom, não faz parte do grid */
+    overflow: auto;
+  }
+
+  .admin-main {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 16px;
+    /* Espaço extra embaixo para não ficar atrás da barra de navegação */
+    padding-bottom: 76px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Toast de feedback ────────────────────────────────────────────────────── */
+.admin-toast {
+  position: fixed;
+  top: 64px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-toast--sucesso {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+}
+
+.admin-toast--erro {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ff6464;
+}
+
+/* ── Confirmação inline nas tabelas ──────────────────────────────────────── */
+.action-confirm-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: toast-in 0.15s ease;
+}
+
+.confirm-pergunta {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  margin-right: 2px;
 }

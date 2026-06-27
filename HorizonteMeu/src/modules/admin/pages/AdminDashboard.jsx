@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Image, AlertTriangle, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Image, AlertTriangle, MapPin, Check, X } from 'lucide-react';
 import { useAdminData } from '../hooks/useAdminData';
 import AdminTopbar from '../components/AdminTopbar';
 import AdminSidebar from '../components/AdminSidebar';
@@ -10,54 +10,129 @@ import ReportsTable from '../components/ReportsTable';
 import PainelAdm from '../components/PainelAdm';
 import '../styles/AdminDashboard.css';
 
+// ── Toast de feedback ────────────────────────────────────────────────────────
+// Aparece no canto superior direito e some após 3 segundos.
+function AdminToast({ toast, onClose }) {
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(onClose, 3000);
+    return () => clearTimeout(t);
+  }, [toast, onClose]);
+
+  if (!toast) return null;
+
+  return (
+    <div className={`admin-toast admin-toast--${toast.tipo}`}>
+      {toast.tipo === 'sucesso' ? <Check size={16} /> : <X size={16} />}
+      <span>{toast.mensagem}</span>
+    </div>
+  );
+}
+
+// ── Componente principal ─────────────────────────────────────────────────────
 function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const { users, photos, metrics, loading, error, deleteUser, approvePhoto, rejectPhoto } = useAdminData();
-  const [reports, setReports] = useState([]);
 
-  const handlePhotoApprove = async (photoId) => {
-    const success = await approvePhoto(photoId);
-    if (success) alert('Foto aprovada com sucesso!');
-  };
+  // Toast: { mensagem, tipo: 'sucesso' | 'erro' }
+  const [toast, setToast] = useState(null);
 
-  const handlePhotoReject = async (photoId) => {
-    const success = await rejectPhoto(photoId);
-    if (success) alert('Foto rejeitada com sucesso!');
-  };
+  // IDs em estado de confirmação inline (para fotos e denúncias)
+  const [confirmandoFotoId, setConfirmandoFotoId]     = useState(null); // 'aprovar' ou 'rejeitar'
+  const [confirmandoFotoAcao, setConfirmandoFotoAcao] = useState(null);
+  const [confirmandoReportId, setConfirmandoReportId]       = useState(null);
+  const [confirmandoReportAcao, setConfirmandoReportAcao]   = useState(null);
 
-  const handleReportResolve = (reportId) => {
-    alert(`Denúncia ${reportId} resolvida!`);
-    // Integrar com API real
-  };
+  // Mock de denúncias — TODO: GET /denuncias quando endpoint estiver disponível
+  const [reports] = useState([
+    { id: 1, type: 'photo',   reason: 'Conteúdo ofensivo',   status: 'pending', typeLabel: 'Foto' },
+    { id: 2, type: 'comment', reason: 'Spam',                status: 'pending', typeLabel: 'Comentário' },
+    { id: 3, type: 'profile', reason: 'Informação incorreta', status: 'pending', typeLabel: 'Perfil' },
+    { id: 4, type: 'comment', reason: 'Conteúdo ofensivo',   status: 'pending', typeLabel: 'Comentário' },
+  ]);
 
-  const handleReportReject = (reportId) => {
-    alert(`Denúncia ${reportId} rejeitada!`);
-    // Integrar com API real
-  };
+  const mostrarToast = useCallback((mensagem, tipo = 'sucesso') => {
+    setToast({ mensagem, tipo });
+  }, []);
 
-  const handleUserEdit = (user) => {
-    alert(`Editar usuário: ${user.nome}`);
-    // TODO: Implementar modal de edição
-  };
+  const fecharToast = useCallback(() => setToast(null), []);
 
-  const handleUserDelete = async (user) => {
-    if (window.confirm(`Tem certeza que deseja excluir ${user.nome}?`)) {
-      const success = await deleteUser(user.id);
-      if (success) alert('Usuário excluído com sucesso!');
-    }
-  };
-
+  // ── Logout ───────────────────────────────────────────────────────────────
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
   };
 
+  // ── Ações de foto ────────────────────────────────────────────────────────
+  // Primeiro clique → abre confirmação inline; segundo clique → executa
+  const pedirConfirmacaoFoto = (id, acao) => {
+    setConfirmandoFotoId(id);
+    setConfirmandoFotoAcao(acao);
+  };
+
+  const cancelarConfirmacaoFoto = () => {
+    setConfirmandoFotoId(null);
+    setConfirmandoFotoAcao(null);
+  };
+
+  const confirmarAcaoFoto = async (id) => {
+    cancelarConfirmacaoFoto();
+    if (confirmandoFotoAcao === 'aprovar') {
+      const ok = await approvePhoto(id);
+      mostrarToast(ok ? 'Foto aprovada com sucesso!' : 'Erro ao aprovar foto.', ok ? 'sucesso' : 'erro');
+    } else {
+      const ok = await rejectPhoto(id);
+      mostrarToast(ok ? 'Foto rejeitada.' : 'Erro ao rejeitar foto.', ok ? 'sucesso' : 'erro');
+    }
+  };
+
+  // ── Ações de denúncia ────────────────────────────────────────────────────
+  const pedirConfirmacaoReport = (id, acao) => {
+    setConfirmandoReportId(id);
+    setConfirmandoReportAcao(acao);
+  };
+
+  const cancelarConfirmacaoReport = () => {
+    setConfirmandoReportId(null);
+    setConfirmandoReportAcao(null);
+  };
+
+  const confirmarAcaoReport = (id) => {
+    cancelarConfirmacaoReport();
+    // TODO: PATCH /denuncias/{id}/resolver ou /rejeitar
+    const msg = confirmandoReportAcao === 'resolver'
+      ? 'Denúncia marcada como resolvida.'
+      : 'Denúncia rejeitada.';
+    mostrarToast(msg, 'sucesso');
+  };
+
+  // ── Ações de usuário ─────────────────────────────────────────────────────
+  // PainelAdm já tem modal de confirmação interno — só precisamos do toast de resultado
+  const handleUserDelete = async (user) => {
+    const ok = await deleteUser(user.id);
+    mostrarToast(
+      ok ? `Usuário "${user.nome}" excluído.` : 'Erro ao excluir usuário.',
+      ok ? 'sucesso' : 'erro'
+    );
+  };
+
+  const handleUserEdit = (user) => {
+    // TODO: abrir modal de edição de usuário
+    mostrarToast(`Edição de "${user.nome}" ainda não implementada.`, 'erro');
+  };
+
+  // ── Loading / Erro ───────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="admin-shell">
         <AdminTopbar userName="Admin" onLogout={handleLogout} />
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <AdminSidebar
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          pendingPhotos={0}
+          pendingReports={0}
+        />
         <div className="admin-main">
           <div className="loading-message">Carregando dados...</div>
         </div>
@@ -69,7 +144,12 @@ function AdminDashboard() {
     return (
       <div className="admin-shell">
         <AdminTopbar userName="Admin" onLogout={handleLogout} />
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <AdminSidebar
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          pendingPhotos={0}
+          pendingReports={0}
+        />
         <div className="admin-main">
           <div className="error-message">{error}</div>
         </div>
@@ -77,40 +157,40 @@ function AdminDashboard() {
     );
   }
 
+  // ── Renderiza a seção ativa ──────────────────────────────────────────────
   const renderContent = () => {
     switch (activeSection) {
+
       case 'dashboard':
         return (
           <div className="admin-content">
-            {/* Métricas */}
             <div className="metrics-grid">
               <MetricsCard
-                value={metrics?.usersCount || '1.284'}
+                value={metrics?.usersCount ?? '—'}
                 label="Usuários cadastrados"
                 subtext="+12 esta semana"
                 trendType="up"
               />
               <MetricsCard
-                value={metrics?.pointsCount || '348'}
+                value={metrics?.pointsCount ?? '—'}
                 label="Pontos turísticos"
                 subtext="42 países"
                 trendType="neutral"
               />
               <MetricsCard
-                value={metrics?.pendingPhotosCount || '7'}
+                value={metrics?.pendingPhotosCount ?? photos.length}
                 label="Fotos aguardando aprovação"
                 subtext="Mais antiga: 3 dias"
                 trendType="warning"
               />
               <MetricsCard
-                value={metrics?.pendingReportsCount || '4'}
+                value={metrics?.pendingReportsCount ?? reports.length}
                 label="Denúncias pendentes"
                 subtext="1 denúncia de perfil"
                 trendType="alert"
               />
             </div>
 
-            {/* Seções de conteúdo em duas colunas */}
             <div className="content-grid">
               <SectionCard
                 title="Fotos aguardando aprovação"
@@ -119,8 +199,11 @@ function AdminDashboard() {
               >
                 <PhotoApprovalTable
                   photos={photos}
-                  onApprove={handlePhotoApprove}
-                  onReject={handlePhotoReject}
+                  confirmandoId={confirmandoFotoId}
+                  confirmandoAcao={confirmandoFotoAcao}
+                  onPedirConfirmacao={pedirConfirmacaoFoto}
+                  onConfirmar={confirmarAcaoFoto}
+                  onCancelar={cancelarConfirmacaoFoto}
                 />
               </SectionCard>
 
@@ -131,20 +214,23 @@ function AdminDashboard() {
               >
                 <ReportsTable
                   reports={reports}
-                  onResolve={handleReportResolve}
-                  onReject={handleReportReject}
+                  confirmandoId={confirmandoReportId}
+                  confirmandoAcao={confirmandoReportAcao}
+                  onPedirConfirmacao={pedirConfirmacaoReport}
+                  onConfirmar={confirmarAcaoReport}
+                  onCancelar={cancelarConfirmacaoReport}
                 />
               </SectionCard>
             </div>
 
-            {/* Seção de pontos turísticos */}
             <SectionCard
               title="Pontos turísticos cadastrados recentemente"
               icon={MapPin}
-              actionLabel="Cadastrar novo"
+              actionLabel="Gerenciar"
+              onViewAll={() => setActiveSection('points')}
             >
               <div className="placeholder-content">
-                <p>Funcionalidade de pontos turísticos em desenvolvimento...</p>
+                <p>Clique em "Gerenciar" para ver e cadastrar pontos turísticos.</p>
               </div>
             </SectionCard>
           </div>
@@ -160,8 +246,11 @@ function AdminDashboard() {
             <SectionCard title="Todas as fotos pendentes" icon={Image}>
               <PhotoApprovalTable
                 photos={photos}
-                onApprove={handlePhotoApprove}
-                onReject={handlePhotoReject}
+                confirmandoId={confirmandoFotoId}
+                confirmandoAcao={confirmandoFotoAcao}
+                onPedirConfirmacao={pedirConfirmacaoFoto}
+                onConfirmar={confirmarAcaoFoto}
+                onCancelar={cancelarConfirmacaoFoto}
               />
             </SectionCard>
           </div>
@@ -177,8 +266,11 @@ function AdminDashboard() {
             <SectionCard title="Todas as denúncias" icon={AlertTriangle}>
               <ReportsTable
                 reports={reports}
-                onResolve={handleReportResolve}
-                onReject={handleReportReject}
+                confirmandoId={confirmandoReportId}
+                confirmandoAcao={confirmandoReportAcao}
+                onPedirConfirmacao={pedirConfirmacaoReport}
+                onConfirmar={confirmarAcaoReport}
+                onCancelar={cancelarConfirmacaoReport}
               />
             </SectionCard>
           </div>
@@ -209,20 +301,7 @@ function AdminDashboard() {
               <p>Gerencie os pontos turísticos cadastrados</p>
             </div>
             <div className="placeholder-content">
-              <p>Funcionalidade de pontos turísticos em desenvolvimento...</p>
-            </div>
-          </div>
-        );
-
-      case 'badges':
-        return (
-          <div className="admin-content">
-            <div className="section-header">
-              <h2>Badges do Sistema</h2>
-              <p>Gerencie as badges e conquistas dos usuários</p>
-            </div>
-            <div className="placeholder-content">
-              <p>Funcionalidade de badges em desenvolvimento...</p>
+              <p>Tabela de pontos turísticos em desenvolvimento...</p>
             </div>
           </div>
         );
@@ -247,8 +326,18 @@ function AdminDashboard() {
 
   return (
     <div className="admin-shell">
+      <AdminToast toast={toast} onClose={fecharToast} />
+
       <AdminTopbar userName="Admin User" onLogout={handleLogout} />
-      <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+
+      {/* Sidebar recebe contadores reais para exibir nos badges */}
+      <AdminSidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        pendingPhotos={metrics?.pendingPhotosCount ?? photos.length}
+        pendingReports={metrics?.pendingReportsCount ?? reports.length}
+      />
+
       <div className="admin-main">{renderContent()}</div>
     </div>
   );

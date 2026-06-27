@@ -1,17 +1,16 @@
 :root {
   --azul-profundo: #0a1628;
-  --azul-escuro: #0d1f3c;
-  --azul-medio: #1a3a6b;
-  --azul-claro: #144a83;
-  --dourado: #f0a500;
+  --azul-escuro:   #0d1f3c;
+  --azul-medio:    #1a3a6b;
+  --azul-claro:    #144a83;
+  --dourado:       #f0a500;
   --dourado-claro: #ffc94a;
-  --branco: #f4f4f4;
-  --cinza-claro: #e0e0e0;
-  --cinza-escuro: #666666;
+  --branco:        #f4f4f4;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
 }
 
+/* ── Desktop: coluna lateral esquerda ─────────────────────────────────────── */
 .admin-sidebar {
   grid-column: 1;
   grid-row: 2;
@@ -60,6 +59,7 @@
   font-weight: 600;
 }
 
+/* Barra dourada à esquerda do item ativo */
 .nav-item.active::before {
   content: '';
   position: absolute;
@@ -75,6 +75,7 @@
   flex-shrink: 0;
 }
 
+/* Badges de contagem */
 .nav-count {
   margin-left: auto;
   font-size: 10px;
@@ -90,119 +91,127 @@
   color: var(--dourado-claro);
 }
 
-.admin-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.admin-sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* Scrollbar da sidebar */
+.admin-sidebar::-webkit-scrollbar { width: 6px; }
+.admin-sidebar::-webkit-scrollbar-track { background: transparent; }
 .admin-sidebar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
-
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Responsividade - Tablet e Mobile */
+/* ── Mobile: barra de navegação INFERIOR (estilo Instagram) ───────────────── */
 @media (max-width: 768px) {
+  /* A sidebar sai do grid e vira uma barra fixa na parte inferior da tela */
   .admin-sidebar {
-    grid-column: 1;
-    grid-row: 3;
+    /* Remove do grid */
+    grid-column: unset;
+    grid-row: unset;
+
+    /* Barra fixa na base */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+
+    /* Layout horizontal */
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-around;
+    height: 60px;
     padding: 0;
+
+    /* Visual */
+    background: var(--azul-escuro);
     border-right: none;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 60px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: hidden;
   }
 
+  /* Grupos viram inline sem título */
   .nav-section {
-    display: flex;
-    align-items: center;
-    gap: 0;
+    display: contents; /* deixa os filhos participarem diretamente do flex */
     margin-bottom: 0;
-    height: 100%;
   }
 
+  /* Rótulo de seção some no mobile */
   .nav-section-label {
     display: none;
   }
 
+  /* Cada item fica centralizado verticalmente */
   .nav-item {
-    display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 8px 12px;
-    font-size: 10px;
+    padding: 6px 4px;
+    font-size: 9px;
+    min-width: 0;
     height: 100%;
-    min-width: 60px;
     position: relative;
   }
 
-  .nav-item::before {
+  /* Remove a barra lateral esquerda do item ativo */
+  .nav-item.active::before {
     display: none;
   }
 
+  /* Barra dourada no TOPO do item ativo (igual Instagram) */
   .nav-item.active::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    top: 0;
+    left: 16%;
+    right: 16%;
     height: 2px;
     background: var(--dourado-claro);
+    border-radius: 0 0 2px 2px;
   }
 
+  /* Ícones ligeiramente maiores */
   .nav-item svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 
+  /* Labels de texto */
+  .nav-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Badge no canto superior direito do ícone */
   .nav-count {
     position: absolute;
-    top: -2px;
-    right: 2px;
+    top: 6px;
+    right: calc(50% - 18px);
     margin-left: 0;
     font-size: 9px;
     padding: 1px 4px;
+    min-width: 16px;
+    text-align: center;
   }
 
-  .admin-sidebar::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .admin-sidebar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .admin-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-  }
+  /* Garante que o conteúdo principal não fique atrás da barra */
+  /* (aplicado via AdminDashboard.css no .admin-main) */
 }
 
-/* Mobile pequeno */
-@media (max-width: 480px) {
-  .nav-item {
-    min-width: 50px;
-    padding: 8px 8px;
-  }
-
+/* ── Mobile pequeno: esconde os labels de texto ───────────────────────────── */
+@media (max-width: 400px) {
   .nav-item span {
     display: none;
   }
 
-  .nav-count {
-    font-size: 8px;
-    padding: 1px 3px;
+  .nav-item svg {
+    width: 24px;
+    height: 24px;
   }
 }

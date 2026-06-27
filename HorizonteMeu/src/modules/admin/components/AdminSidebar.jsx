@@ -5,14 +5,13 @@ import {
   AlertTriangle,
   MapPin,
   Users,
-  Trophy,
   Settings,
 } from 'lucide-react';
 import '../styles/AdminSidebar.css';
 
-function AdminSidebar({ activeSection, onSectionChange }) {
-    const sections = [
-       {
+function AdminSidebar({ activeSection, onSectionChange, pendingPhotos = 0, pendingReports = 0 }) {
+  const sections = [
+    {
       id: 'overview',
       label: 'Visão geral',
       items: [
@@ -23,33 +22,33 @@ function AdminSidebar({ activeSection, onSectionChange }) {
       id: 'moderation',
       label: 'Moderação',
       items: [
-        { id: 'photos', icon: Image, label: 'Fotos pendentes', badge: '7' },
-        { id: 'reports', icon: AlertTriangle, label: 'Denúncias', badge: '4' },
+        // Badges dinâmicos: só aparecem se o número for maior que zero
+        { id: 'photos',  icon: Image,          label: 'Fotos pendentes', badge: pendingPhotos  > 0 ? String(pendingPhotos)  : null, badgeColor: 'amber' },
+        { id: 'reports', icon: AlertTriangle,   label: 'Denúncias',      badge: pendingReports > 0 ? String(pendingReports) : null, badgeColor: 'red'   },
       ],
     },
     {
       id: 'content',
       label: 'Conteúdo',
       items: [
-        { id: 'points', icon: MapPin, label: 'Pontos turísticos', badge: null },
-        { id: 'users', icon: Users, label: 'Usuários', badge: null },
+        { id: 'points', icon: MapPin,  label: 'Pontos turísticos', badge: null },
+        { id: 'users',  icon: Users,   label: 'Usuários',          badge: null },
       ],
     },
     {
       id: 'system',
       label: 'Sistema',
       items: [
-        { id: 'badges', icon: Trophy, label: 'Badges', badge: null },
+        // Badges removida desta seção — não existe no backend
         { id: 'settings', icon: Settings, label: 'Configurações', badge: null },
       ],
     },
   ];
 
-
   return (
     <div className="admin-sidebar">
-        {sections.map((section) => (
-         <div key={section.id} className="nav-section">
+      {sections.map((section) => (
+        <div key={section.id} className="nav-section">
           <div className="nav-section-label">{section.label}</div>
           {section.items.map((item) => {
             const Icon = item.icon;
@@ -62,7 +61,11 @@ function AdminSidebar({ activeSection, onSectionChange }) {
               >
                 <Icon size={16} />
                 <span>{item.label}</span>
-                {item.badge && <span className={`nav-count ${item.id === 'photos' ? 'amber' : ''}`}>{item.badge}</span>}
+                {item.badge && (
+                  <span className={`nav-count ${item.badgeColor === 'amber' ? 'amber' : ''}`}>
+                    {item.badge}
+                  </span>
+                )}
               </div>
             );
           })}
@@ -70,7 +73,6 @@ function AdminSidebar({ activeSection, onSectionChange }) {
       ))}
     </div>
   );
-
 }
 
 export default AdminSidebar;
