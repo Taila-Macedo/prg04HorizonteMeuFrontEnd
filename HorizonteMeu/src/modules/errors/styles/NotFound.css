@@ -1,0 +1,150 @@
+.nf-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--azul-profundo);
+}
+
+.nf-card {
+  background: rgba(1, 38, 119, 0.6);
+  border: 1px solid rgba(0, 180, 252, 0.25);
+  border-radius: 16px;
+  padding: 56px 44px;
+  width: 500px;
+  max-width: 100%;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Bússola animada */
+.nf-compass {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 16px;
+  animation: spin 6s linear infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 12px rgba(240, 165, 0, 0.5));
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(30deg); }
+  40%  { transform: rotate(-15deg); }
+  60%  { transform: rotate(20deg); }
+  80%  { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Código 404 */
+.nf-code {
+  font-family: 'Playfair Display', serif;
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--dourado);
+  margin: 0 0 8px;
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(240, 165, 0, 0.3);
+  letter-spacing: -2px;
+}
+
+/* Título */
+.nf-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #f4f4f4;
+  margin: 0 0 20px;
+  font-weight: 600;
+}
+
+/* Descrição */
+.nf-descricao {
+  color: rgba(247, 248, 252, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 36px;
+}
+
+/* Botões */
+.nf-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.nf-btn-primario {
+  padding: 13px 28px;
+  background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+  border: none;
+  border-radius: 8px;
+  color: var(--azul-profundo);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.nf-btn-primario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(240, 165, 0, 0.35);
+  filter: brightness(1.1);
+}
+
+.nf-btn-primario:active {
+  transform: translateY(0);
+}
+
+.nf-btn-secundario {
+  padding: 13px 28px;
+  background: transparent;
+  border: 1.5px solid rgba(0, 180, 252, 0.4);
+  border-radius: 8px;
+  color: rgba(247, 248, 252, 0.75);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.nf-btn-secundario:hover {
+  border-color: rgba(0, 180, 252, 0.8);
+  color: #f4f4f4;
+  transform: translateY(-2px);
+}
+
+.nf-btn-secundario:active {
+  transform: translateY(0);
+}
+
+/* Contador de redirect */
+.nf-redirect {
+  color: rgba(247, 248, 252, 0.35);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.nf-contador {
+  color: var(--dourado-claro);
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .nf-card { padding: 40px 24px; }
+  .nf-code { font-size: 4.5rem; }
+  .nf-acoes { flex-direction: column; }
+  .nf-btn-primario,
+  .nf-btn-secundario { width: 100%; }
+}

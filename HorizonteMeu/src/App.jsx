@@ -16,20 +16,18 @@ import FavoritosPage from './modules/favorites/pages/Favoritos';
 import RoteirosPage from './modules/itinerary/pages/ListaRoteiros';
 import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
 import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro';
-import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro'; 
+import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro';
+import NotFoundPage from './modules/errors/pages/NotFound';
 import './App.css';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rotas públicas */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/cadastro" element={<CadastroPage />} />
         <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
-
-        {/* Rotas protegidas — exigem login */}
         <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/perfil"              element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
         <Route path="/configuracoes"       element={<PrivateRoute><ConfiguracoesPage /></PrivateRoute>} />
@@ -41,12 +39,9 @@ function App() {
         <Route path="/roteiros"            element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
         <Route path="/roteiros/novo"       element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
         <Route path="/roteiros/:id"        element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} />
-        <Route path="/roteiros/:id/editar" element={<PrivateRoute><EditarRoteiroPage /></PrivateRoute>} /> {/* ← NOVO */}
-
-        {/* Rota de admin — exige login E perfil ADMINISTRADOR */}
+        <Route path="/roteiros/:id/editar" element={<PrivateRoute><EditarRoteiroPage /></PrivateRoute>} /> 
         <Route path="/admin" element={<PrivateRoute><PainelAdminPage /></PrivateRoute>} />
-
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
