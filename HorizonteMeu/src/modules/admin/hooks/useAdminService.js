@@ -3,7 +3,7 @@
  * Lida com todas as chamadas ao backend
  */
 
-const API_BASE_URL = 'http://localhost:8080/api'; // Ajuste para a URL do seu backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'; 
 
 /**
  * Utilitário para chamadas fetch com autenticação
