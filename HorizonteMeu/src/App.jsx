@@ -18,6 +18,7 @@ import NovoRoteiroPage from './modules/itinerary/pages/NovoRoteiro';
 import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro';
 import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro';
 import NotFoundPage from './modules/errors/pages/NotFound';
+import EditarComentarioPage from './modules/comments/pages/EditarComentario';
 import './App.css';
 
 function App() {
@@ -35,11 +36,12 @@ function App() {
         <Route path="/pontos/novo"         element={<PrivateRoute><AdicionarPontoPage /></PrivateRoute>} />
         <Route path="/pontos/:id"          element={<PrivateRoute><DetalhePontoPage /></PrivateRoute>} />
         <Route path="/pontos/:id/editar"   element={<PrivateRoute><EditarPontoPage /></PrivateRoute>} />
+        <Route path="/pontos/:id/comentarios/:comentarioId/editar" element={<PrivateRoute><EditarComentarioPage /></PrivateRoute>} />
         <Route path="/favoritos"           element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
         <Route path="/roteiros"            element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
         <Route path="/roteiros/novo"       element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
         <Route path="/roteiros/:id"        element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} />
-        <Route path="/roteiros/:id/editar" element={<PrivateRoute><EditarRoteiroPage /></PrivateRoute>} /> 
+        <Route path="/roteiros/:id/editar" element={<PrivateRoute><EditarRoteiroPage /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute><PainelAdminPage /></PrivateRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

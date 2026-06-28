@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, Flag, X, ImagePlus } from 'lucide-react';
+import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
-import { PONTOS_MOCK, FOTOS_MOCK, COMENTARIOS_MOCK, CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
+import { PONTOS_MOCK, FOTOS_MOCK, CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
+import { ComentariosSecao } from '../../comments/components/ComentariosSecao';
 import '../styles/DetalhePonto.css';
 
 // Achata todos os pontos de todos os países em um único objeto indexado por id
@@ -28,32 +29,24 @@ function Estrelas({ nota, tamanho = 16 }) {
 export default function DetalhePonto() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const comentarioFotoRef = useRef(null);
   const navRef = useRef(null);
   const btnFavoritarRef = useRef(null);
 
   const [ponto, setPonto] = useState(null);
   const [fotos, setFotos] = useState([]);
-  const [comentarios, setComentarios] = useState([]);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [favoritado, setFavoritado] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [avioes, setAvioes] = useState([]);
 
-  const [denunciaModal, setDenunciaModal] = useState({ aberto: false, comentarioId: null });
-  const [motivoDenuncia, setMotivoDenuncia] = useState('');
-  const [novoComentario, setNovoComentario] = useState({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
-
   useEffect(() => {
-    // TODO: GET /pontos-turisticos/{id}, GET /fotos/ponto/{id}, GET /comentarios/ponto/{id}
+    // TODO: GET /pontos-turisticos/{id}, GET /fotos/ponto/{id}
     setTimeout(() => {
       const pontoEncontrado = PONTOS_POR_ID[Number(id)];
       const fotosEncontradas = FOTOS_MOCK[Number(id)] ?? FOTOS_MOCK[1];
-      const comentariosEncontrados = COMENTARIOS_MOCK[Number(id)] ?? COMENTARIOS_MOCK[1];
 
       setPonto(pontoEncontrado ?? null);
       setFotos(fotosEncontradas);
-      setComentarios(comentariosEncontrados);
       setCarregando(false);
     }, 400);
   }, [id]);
@@ -89,43 +82,6 @@ export default function DetalhePonto() {
     } else {
       setFavoritado(true);
     }
-  };
-
-  const handleFotoComentario = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const preview = URL.createObjectURL(file);
-    setNovoComentario((prev) => ({ ...prev, fotoPreview: preview, fotoFile: file }));
-  };
-
-  const removerFotoComentario = () => {
-    setNovoComentario((prev) => ({ ...prev, fotoPreview: null, fotoFile: null }));
-  };
-
-  const enviarComentario = () => {
-    if (!novoComentario.texto.trim()) return;
-    const novo = {
-      id: Date.now(),
-      usuario: { nome: 'Você' },
-      texto: novoComentario.texto,
-      nota: novoComentario.nota,
-      curtidas: 0,
-      fotoUrl: novoComentario.fotoPreview,
-    };
-    setComentarios((prev) => [novo, ...prev]);
-    setNovoComentario({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
-  };
-
-  const abrirDenuncia = (comentarioId) => {
-    setDenunciaModal({ aberto: true, comentarioId });
-    setMotivoDenuncia('');
-  };
-
-  const enviarDenuncia = () => {
-    if (!motivoDenuncia.trim()) return;
-    setDenunciaModal({ aberto: false, comentarioId: null });
-    setMotivoDenuncia('');
-    alert('Denúncia enviada! Nossa equipe irá analisar.');
   };
 
   if (carregando) {
@@ -231,125 +187,13 @@ export default function DetalhePonto() {
 
         <div className="detalhe-secao-titulo">
           <MessageCircle size={18} />
-          <h2>Avaliações ({comentarios.length})</h2>
+          <h2>Avaliações</h2>
         </div>
 
         <div className="detalhe-comentarios">
-
-          <div className="comentario-form">
-            <h3>Deixe sua avaliação</h3>
-            <div className="form-nota">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  className={`nota-estrela ${n <= novoComentario.nota ? 'ativa' : ''}`}
-                  onClick={() => setNovoComentario((prev) => ({ ...prev, nota: n }))}
-                >
-                  <Star size={22} fill={n <= novoComentario.nota ? 'currentColor' : 'none'} />
-                </button>
-              ))}
-            </div>
-            <textarea
-              className="form-textarea"
-              placeholder="Conte sua experiência neste lugar..."
-              value={novoComentario.texto}
-              onChange={(e) => setNovoComentario((prev) => ({ ...prev, texto: e.target.value }))}
-              rows={3}
-            />
-            {novoComentario.fotoPreview && (
-              <div className="form-foto-preview">
-                <img src={novoComentario.fotoPreview} alt="Preview" />
-                <button className="btn-remover-foto" onClick={removerFotoComentario}>
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-            <div className="form-rodape">
-              <button className="btn-anexar-foto" onClick={() => comentarioFotoRef.current?.click()}>
-                <ImagePlus size={16} />
-                Anexar foto
-              </button>
-              <input
-                ref={comentarioFotoRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFotoComentario}
-              />
-              <button className="btn-enviar-comentario" onClick={enviarComentario}>
-                Publicar avaliação
-              </button>
-            </div>
-          </div>
-
-          <div className="comentarios-lista">
-            {comentarios.length === 0 ? (
-              <div className="aba-vazia">
-                <MessageCircle size={32} />
-                <p>Nenhuma avaliação ainda. Seja o primeiro!</p>
-              </div>
-            ) : (
-              comentarios.map((c) => (
-                <div key={c.id} className="comentario-card">
-                  <div className="comentario-header">
-                    <div className="comentario-avatar">
-                      {c.usuario.nome.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="comentario-header-info">
-                      <span className="comentario-autor">{c.usuario.nome}</span>
-                      <Estrelas nota={c.nota} tamanho={13} />
-                    </div>
-                  </div>
-                  <p className="comentario-texto">{c.texto}</p>
-                  {c.fotoUrl && (
-                    <img className="comentario-foto" src={c.fotoUrl} alt="Foto do comentário" />
-                  )}
-                  <div className="comentario-footer">
-                    <button className="btn-curtir">
-                      <Heart size={13} /> {c.curtidas}
-                    </button>
-                    <button className="btn-denunciar" onClick={() => abrirDenuncia(c.id)}>
-                      <Flag size={13} /> Denunciar
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          <ComentariosSecao pontoId={id} />
         </div>
       </div>
-
-      {denunciaModal.aberto && (
-        <div className="modal-overlay" onClick={() => setDenunciaModal({ aberto: false, comentarioId: null })}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Denunciar comentário</h3>
-              <button className="modal-fechar" onClick={() => setDenunciaModal({ aberto: false, comentarioId: null })}>
-                <X size={18} />
-              </button>
-            </div>
-            <p className="modal-descricao">Qual o motivo da denúncia?</p>
-            <div className="modal-opcoes">
-              {['Conteúdo ofensivo', 'Spam', 'Informação incorreta', 'Outro'].map((op) => (
-                <button
-                  key={op}
-                  className={`modal-opcao ${motivoDenuncia === op ? 'selecionada' : ''}`}
-                  onClick={() => setMotivoDenuncia(op)}
-                >
-                  {op}
-                </button>
-              ))}
-            </div>
-            <button
-              className="btn-enviar-denuncia"
-              onClick={enviarDenuncia}
-              disabled={!motivoDenuncia}
-            >
-              Enviar denúncia
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

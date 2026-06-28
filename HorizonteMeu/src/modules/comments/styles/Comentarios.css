@@ -1,0 +1,525 @@
+.comentarios-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Formulário novo comentário ─────────────── */
+
+.comentario-form {
+  background: rgba(13, 31, 60, 0.7);
+  border: 1px solid rgba(26, 58, 107, 0.7);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.comentario-form h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--branco);
+  margin: 0;
+}
+
+.form-nota {
+  display: flex;
+  gap: 6px;
+}
+
+.nota-estrela {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: rgba(244, 244, 244, 0.25);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.nota-estrela:hover,
+.nota-estrela.ativa {
+  color: var(--dourado);
+  transform: scale(1.15);
+}
+
+.form-textarea {
+  background: rgba(10, 22, 40, 0.6);
+  border: 1px solid rgba(26, 58, 107, 0.7);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--branco);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-textarea::placeholder {
+  color: rgba(244, 244, 244, 0.3);
+}
+
+.form-textarea:focus {
+  border-color: var(--azul-medio);
+}
+
+/* Preview de foto no comentário */
+.form-foto-preview {
+  position: relative;
+  width: 120px;
+}
+
+.form-foto-preview img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 58, 107, 0.5);
+}
+
+.btn-remover-foto {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: rgba(10, 22, 40, 0.9);
+  border: 1px solid rgba(26, 58, 107, 0.6);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(244, 244, 244, 0.6);
+  transition: color 0.2s;
+}
+
+.btn-remover-foto:hover {
+  color: #f87171;
+}
+
+.form-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-anexar-foto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px solid rgba(26, 58, 107, 0.6);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: rgba(244, 244, 244, 0.5);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-anexar-foto:hover {
+  border-color: var(--azul-medio);
+  color: var(--branco);
+}
+
+.btn-enviar-comentario {
+  padding: 10px 24px;
+  background: var(--dourado);
+  border: none;
+  border-radius: 999px;
+  color: #0a1628;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-enviar-comentario:hover:not(:disabled) {
+  background: var(--dourado-claro);
+  transform: translateY(-1px);
+}
+
+.btn-enviar-comentario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Lista de comentários ───────────────────── */
+
+.comentarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.comentarios-vazios {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: rgba(244, 244, 244, 0.3);
+}
+
+.comentario-card {
+  background: rgba(13, 31, 60, 0.7);
+  border: 1px solid rgba(26, 58, 107, 0.6);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comentario-card:hover {
+  border-color: rgba(240, 165, 0, 0.2);
+}
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comentario-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--azul-medio), var(--azul-claro));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--branco);
+  flex-shrink: 0;
+}
+
+.comentario-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.comentario-autor-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comentario-autor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--branco);
+}
+
+.comentario-editado-badge {
+  font-size: 0.7rem;
+  color: rgba(244, 244, 244, 0.4);
+  border: 1px solid rgba(244, 244, 244, 0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-style: italic;
+}
+
+/* Estrelas */
+.estrelas {
+  display: flex;
+  gap: 2px;
+}
+
+.estrela-ativa {
+  color: var(--dourado);
+}
+
+.estrela-vazia {
+  color: rgba(244, 244, 244, 0.2);
+}
+
+.comentario-texto {
+  font-size: 0.88rem;
+  color: rgba(244, 244, 244, 0.72);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.comentario-foto {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 10px;
+  border: 1px solid rgba(26, 58, 107, 0.4);
+}
+
+/* ── Footer do card ─────────────────────────── */
+
+.comentario-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-curtir {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid rgba(26, 58, 107, 0.5);
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: rgba(244, 244, 244, 0.5);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-curtir:hover,
+.btn-curtir.curtido {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.btn-editar-comentario {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: rgba(244, 244, 244, 0.4);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-editar-comentario:hover {
+  color: var(--dourado-claro);
+  border-color: rgba(255, 201, 74, 0.4);
+}
+
+.btn-excluir-comentario {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: rgba(244, 244, 244, 0.3);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-excluir-comentario:hover {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.btn-denunciar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: rgba(244, 244, 244, 0.3);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-denunciar:hover {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+/* ── Confirmação de exclusão inline ─────────── */
+
+.confirmacao-excluir {
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirmacao-excluir p {
+  font-size: 0.85rem;
+  color: rgba(244, 244, 244, 0.75);
+  margin: 0;
+}
+
+.confirmacao-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-confirmar-excluir {
+  padding: 6px 16px;
+  background: #f87171;
+  border: none;
+  border-radius: 999px;
+  color: #0a1628;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.btn-confirmar-excluir:hover {
+  filter: brightness(1.1);
+}
+
+.btn-cancelar-excluir {
+  padding: 6px 16px;
+  background: none;
+  border: 1px solid rgba(244, 244, 244, 0.2);
+  border-radius: 999px;
+  color: rgba(244, 244, 244, 0.55);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-cancelar-excluir:hover {
+  border-color: rgba(244, 244, 244, 0.5);
+  color: var(--branco);
+}
+
+/* ── Modal de denúncia ──────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: #0d1f3c;
+  border: 1px solid rgba(26, 58, 107, 0.8);
+  border-radius: 16px;
+  padding: 28px;
+  width: 420px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--branco);
+  margin: 0;
+}
+
+.modal-fechar {
+  background: none;
+  border: none;
+  color: rgba(244, 244, 244, 0.45);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  transition: color 0.2s;
+}
+
+.modal-fechar:hover {
+  color: var(--branco);
+}
+
+.modal-descricao {
+  font-size: 0.88rem;
+  color: rgba(244, 244, 244, 0.55);
+  margin: 0;
+}
+
+.modal-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-opcao {
+  padding: 10px 16px;
+  background: rgba(10, 22, 40, 0.6);
+  border: 1px solid rgba(26, 58, 107, 0.5);
+  border-radius: 10px;
+  color: rgba(244, 244, 244, 0.65);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.modal-opcao:hover {
+  border-color: var(--azul-medio);
+  color: var(--branco);
+}
+
+.modal-opcao.selecionada {
+  border-color: var(--dourado);
+  background: rgba(240, 165, 0, 0.08);
+  color: var(--dourado);
+}
+
+.btn-enviar-denuncia {
+  padding: 12px;
+  background: var(--dourado);
+  border: none;
+  border-radius: 10px;
+  color: #0a1628;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.btn-enviar-denuncia:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-enviar-denuncia:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

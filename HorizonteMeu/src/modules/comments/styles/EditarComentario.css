@@ -1,0 +1,292 @@
+.ec-page {
+  min-height: 100vh;
+  background-color: var(--azul-profundo);
+}
+
+.ec-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ── Cabeçalho ──────────────────────────────── */
+
+.ec-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.ec-btn-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px solid rgba(26, 58, 107, 0.6);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: rgba(244, 244, 244, 0.6);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.ec-btn-voltar:hover {
+  border-color: rgba(26, 58, 107, 1);
+  color: var(--branco);
+}
+
+.ec-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dourado);
+  margin: 0;
+}
+
+/* ── Card do formulário ─────────────────────── */
+
+.ec-card {
+  background: rgba(13, 31, 60, 0.7);
+  border: 1px solid rgba(26, 58, 107, 0.7);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Autor ──────────────────────────────────── */
+
+.ec-autor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ec-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--azul-medio), var(--azul-claro));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--branco);
+  flex-shrink: 0;
+}
+
+.ec-autor-nome {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--branco);
+}
+
+/* ── Campo genérico ─────────────────────────── */
+
+.ec-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ec-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(244, 244, 244, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* ── Estrelas ───────────────────────────────── */
+
+.ec-estrelas {
+  display: flex;
+  gap: 8px;
+}
+
+.ec-estrela-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: rgba(244, 244, 244, 0.2);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.ec-estrela-btn:hover,
+.ec-estrela-btn.ativa {
+  color: var(--dourado);
+  transform: scale(1.2);
+}
+
+.ec-nota-texto {
+  font-size: 0.85rem;
+  color: var(--dourado-claro);
+  font-weight: 600;
+  min-height: 18px;
+}
+
+/* ── Textarea ───────────────────────────────── */
+
+.ec-textarea {
+  background: rgba(10, 22, 40, 0.6);
+  border: 1.5px solid rgba(26, 58, 107, 0.7);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--branco);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 120px;
+}
+
+.ec-textarea::placeholder {
+  color: rgba(244, 244, 244, 0.25);
+}
+
+.ec-textarea:focus {
+  border-color: var(--azul-medio);
+  box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.2);
+}
+
+.ec-contador {
+  font-size: 0.75rem;
+  color: rgba(244, 244, 244, 0.3);
+  text-align: right;
+}
+
+/* ── Ações ──────────────────────────────────── */
+
+.ec-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid rgba(26, 58, 107, 0.4);
+}
+
+.ec-btn-cancelar {
+  padding: 12px 24px;
+  background: none;
+  border: 1.5px solid rgba(26, 58, 107, 0.6);
+  border-radius: 8px;
+  color: rgba(244, 244, 244, 0.6);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ec-btn-cancelar:hover:not(:disabled) {
+  border-color: rgba(26, 58, 107, 1);
+  color: var(--branco);
+}
+
+.ec-btn-salvar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+  border: none;
+  border-radius: 8px;
+  color: var(--azul-profundo);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.ec-btn-salvar:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.ec-btn-salvar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ec-salvando {
+  font-size: 0.9rem;
+}
+
+/* ── Toast ──────────────────────────────────── */
+
+.ec-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 31, 60, 0.95);
+  border: 1px solid rgba(240, 165, 0, 0.4);
+  border-radius: 10px;
+  padding: 12px 24px;
+  color: var(--dourado-claro);
+  font-size: 0.88rem;
+  font-weight: 600;
+  z-index: 2000;
+  animation: toastIn 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Estado de erro ─────────────────────────── */
+
+.ec-erro {
+  min-height: 100vh;
+  background: var(--azul-profundo);
+}
+
+.ec-erro-box {
+  max-width: 400px;
+  margin: 80px auto;
+  text-align: center;
+  color: rgba(244, 244, 244, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ec-erro-box button {
+  padding: 10px 24px;
+  background: var(--dourado);
+  border: none;
+  border-radius: 8px;
+  color: var(--azul-profundo);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── Responsivo ─────────────────────────────── */
+
+@media (max-width: 600px) {
+  .ec-card { padding: 24px 18px; }
+  .ec-acoes { justify-content: stretch; }
+  .ec-btn-cancelar,
+  .ec-btn-salvar { flex: 1; justify-content: center; }
+}
