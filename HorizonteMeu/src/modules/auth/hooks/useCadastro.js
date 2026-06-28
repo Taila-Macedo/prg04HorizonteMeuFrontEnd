@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // CORRIGIDO: importa useNavigate
+import { useNavigate } from 'react-router-dom';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useCadastro() {
-  const navigate = useNavigate(); // CORRIGIDO: hook de navegação do React Router
+  const navigate = useNavigate();
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -10,25 +12,25 @@ export function useCadastro() {
   const [confirmaSenha, setConfirmaSenha] = useState('');
 
   const [showError, setShowError] = useState(false);
+  const [erroApi, setErroApi] = useState('');
+  const [carregando, setCarregando] = useState(false);
   const [nomeTouched, setNomeTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [senhaTouched, setSenhaTouched] = useState(false);
   const [confirmaSenhaTouched, setConfirmaSenhaTouched] = useState(false);
 
-  // Regras de validação síncronas
   const isNomeValid = nome.trim().length >= 2;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isSenhaValid = senha.length >= 6;
   const isConfirmaSenhaValid = confirmaSenha === senha && confirmaSenha.length > 0;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Ativa o estado "touched" em todos para mostrar os erros caso tentem enviar em branco
     setNomeTouched(true);
     setEmailTouched(true);
     setSenhaTouched(true);
     setConfirmaSenhaTouched(true);
+    setErroApi('');
 
     if (!isNomeValid || !isEmailValid || !isSenhaValid || !isConfirmaSenhaValid) {
       setShowError(true);
@@ -36,19 +38,37 @@ export function useCadastro() {
     }
 
     setShowError(false);
-    // TODO: integrar com POST /usuarios quando a API estiver pronta
-    // CORRIGIDO: useNavigate em vez de window.location.href
-    navigate('/dashboard');
+    setCarregando(true);
+
+    try {
+      const res = await fetch(`${BASE}/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha }),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text().catch(() => '');
+        throw new Error(msg || 'Erro ao criar conta. Tente novamente.');
+      }
+
+      // Conta criada — redireciona para login
+      navigate('/login');
+    } catch (err) {
+      setErroApi(err.message || 'Erro ao criar conta. Tente novamente.');
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const handleInputChange = () => {
     setShowError(false);
+    setErroApi('');
   };
 
   const handleGoogleCadastro = () => {
     // TODO: integrar com OAuth do Google futuramente
-    // CORRIGIDO: useNavigate em vez de window.location.href
-    navigate('/dashboard');
+    alert('Cadastro com Google ainda não disponível.');
   };
 
   return {
@@ -57,6 +77,8 @@ export function useCadastro() {
     senha, setSenha,
     confirmaSenha, setConfirmaSenha,
     showError,
+    erroApi,
+    carregando,
     nomeTouched, setNomeTouched,
     emailTouched, setEmailTouched,
     senhaTouched, setSenhaTouched,
@@ -67,6 +89,6 @@ export function useCadastro() {
     isConfirmaSenhaValid,
     handleSubmit,
     handleInputChange,
-    handleGoogleCadastro
+    handleGoogleCadastro,
   };
 }

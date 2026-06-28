@@ -1,19 +1,18 @@
+// src/modules/auth/pages/Login.jsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // CORRIGIDO: importa Link
+import { Link } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import '../styles/login.css';
 
 function LoginPage() {
   const {
-    email,
-    setEmail,
-    senha,
-    setSenha,
+    email, setEmail,
+    senha, setSenha,
     showError,
-    emailTouched,
-    setEmailTouched,
-    senhaTouched,
-    setSenhaTouched,
+    erroApi,
+    carregando,
+    emailTouched, setEmailTouched,
+    senhaTouched, setSenhaTouched,
     isEmailValid,
     isSenhaValid,
     handleSubmit,
@@ -49,7 +48,6 @@ function LoginPage() {
         </div>
 
         <form id="form-login" noValidate onSubmit={handleSubmit}>
-          {/* Campo E-mail */}
           <div className="form-group">
             <input
               type="email"
@@ -58,12 +56,8 @@ function LoginPage() {
               placeholder=" "
               required
               autoComplete="email"
-              title="Digite um e-mail válido"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setEmail(e.target.value); handleInputChange(); }}
               onBlur={() => setEmailTouched(true)}
               className={emailTouched ? (isEmailValid ? 'valid' : 'invalid') : ''}
             />
@@ -73,7 +67,6 @@ function LoginPage() {
             </span>
           </div>
 
-          {/* Campo Senha */}
           <div className="form-group">
             <input
               type="password"
@@ -82,12 +75,8 @@ function LoginPage() {
               placeholder=" "
               required
               minLength={6}
-              title="A senha deve ter no mínimo 6 caracteres"
               value={senha}
-              onChange={(e) => {
-                setSenha(e.target.value);
-                handleInputChange();
-              }}
+              onChange={(e) => { setSenha(e.target.value); handleInputChange(); }}
               onBlur={() => setSenhaTouched(true)}
               className={senhaTouched ? (isSenhaValid ? 'valid' : 'invalid') : ''}
             />
@@ -97,22 +86,33 @@ function LoginPage() {
             </span>
           </div>
 
-          <button type="submit" className="btn-login">🔐 Entrar</button>
+          <button type="submit" className="btn-login" disabled={carregando}>
+            {carregando ? '⏳ Entrando...' : '🔐 Entrar'}
+          </button>
 
+          {/* Erro de validação dos campos */}
           <div id="msg-erro" className={showError ? 'visible' : ''}>
             ⚠️ Preencha todos os campos corretamente.
           </div>
+
+          {/* Erro vindo da API (e-mail/senha errados) */}
+          {erroApi && (
+            <div id="msg-erro" className="visible" style={{ marginTop: '8px' }}>
+              ⚠️ {erroApi}
+            </div>
+          )}
         </form>
 
         <div className="login-footer">
-          <Link to="/recuperar-senha" style={{ color: 'var(--azul-claro)', textDecoration: 'none', fontSize: '0.85rem' }}
-            onMouseOver={e => e.target.style.color='var(--dourado)'}
-            onMouseOut={e => e.target.style.color='var(--azul-claro)'}
+          <Link
+            to="/recuperar-senha"
+            style={{ color: 'var(--azul-claro)', textDecoration: 'none', fontSize: '0.85rem' }}
+            onMouseOver={e => e.target.style.color = 'var(--dourado)'}
+            onMouseOut={e => e.target.style.color = 'var(--azul-claro)'}
           >
             Esqueceu a senha?
           </Link>
           <p className="cadastro-link">
-            {/* CORRIGIDO: era <a href="/cadastro">, causava reload da página */}
             Ainda não tem conta? <Link to="/cadastro">Cadastre-se</Link>
           </p>
         </div>

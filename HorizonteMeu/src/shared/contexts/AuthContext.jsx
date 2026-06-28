@@ -2,25 +2,12 @@
 //
 // Contexto global de autenticação.
 // Guarda o token JWT e os dados do usuário logado em memória + localStorage.
-// TODO: quando integrar com o back, substituir o loginMock por POST /auth/login
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-// ─── MOCK DO USUÁRIO LOGADO ──────────────────────────────────────────────────
-// TODO: remover quando integrar com POST /auth/login
-// Estrutura alinhada com UsuarioGetResponseDto do backend:
-// id, nome, email, perfil (USUARIO | ADMINISTRADOR), bio, dataCriacao
-const USUARIO_MOCK = {
-  id: 1,
-  nome: 'Taíla Martins',
-  email: 'taila@email.com',
-  perfil: 'USUARIO',
-  bio: '🌎 Carioca explorando o mundo | ✨ Colecionando horizontes e histórias | ❤️ Amante de gastronomia e arte',
-  desde: 'mar/2026',
-  stats: { viagens: 23, roteiros: 8, favoritos: 45 },
-};
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
@@ -39,20 +26,32 @@ export function AuthProvider({ children }) {
     setCarregando(false);
   }, []);
 
-  // Login — salva token e usuário no estado e no localStorage
+  // Login — chama POST /auth/login e salva token + usuário
   const login = async (email, senha) => {
-    // TODO: substituir por POST /auth/login quando a API estiver pronta
-    // const res = await fetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
-    // const { token, usuario } = await res.json();
+    const res = await fetch(`${BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha }),
+    });
 
-    // Simulação: aceita qualquer email/senha por enquanto
-    const tokenMock = 'mock-jwt-token-' + Date.now();
-    const usuarioLogado = { ...USUARIO_MOCK, email };
+    if (!res.ok) {
+      throw new Error('E-mail ou senha inválidos.');
+    }
 
-    localStorage.setItem('hm_token', tokenMock);
+    // Resposta: { token, id, nome, email, perfil }
+    const dados = await res.json();
+
+    const usuarioLogado = {
+      id: dados.id,
+      nome: dados.nome,
+      email: dados.email,
+      perfil: dados.perfil,
+    };
+
+    localStorage.setItem('hm_token', dados.token);
     localStorage.setItem('hm_usuario', JSON.stringify(usuarioLogado));
 
-    setToken(tokenMock);
+    setToken(dados.token);
     setUsuario(usuarioLogado);
   };
 

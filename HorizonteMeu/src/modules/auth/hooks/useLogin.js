@@ -1,15 +1,16 @@
-// src/modules/auth/hooks/useLogin.js
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 
 export function useLogin() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // pega a função login do contexto
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showError, setShowError] = useState(false);
+  const [erroApi, setErroApi] = useState('');
+  const [carregando, setCarregando] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [senhaTouched, setSenhaTouched] = useState(false);
 
@@ -20,6 +21,7 @@ export function useLogin() {
     e.preventDefault();
     setEmailTouched(true);
     setSenhaTouched(true);
+    setErroApi('');
 
     if (!isEmailValid || !isSenhaValid) {
       setShowError(true);
@@ -27,23 +29,34 @@ export function useLogin() {
     }
 
     setShowError(false);
-    // TODO: o login() já vai chamar POST /auth/login quando a API estiver pronta
-    await login(email, senha);
-    navigate('/dashboard');
+    setCarregando(true);
+
+    try {
+      await login(email, senha);
+      navigate('/dashboard');
+    } catch (err) {
+      setErroApi(err.message || 'Erro ao fazer login. Tente novamente.');
+    } finally {
+      setCarregando(false);
+    }
   };
 
-  const handleInputChange = () => setShowError(false);
+  const handleInputChange = () => {
+    setShowError(false);
+    setErroApi('');
+  };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     // TODO: integrar com OAuth do Google futuramente
-    await login('google@user.com', '');
-    navigate('/dashboard');
+    alert('Login com Google ainda não disponível.');
   };
 
   return {
     email, setEmail,
     senha, setSenha,
     showError,
+    erroApi,
+    carregando,
     emailTouched, setEmailTouched,
     senhaTouched, setSenhaTouched,
     isEmailValid,

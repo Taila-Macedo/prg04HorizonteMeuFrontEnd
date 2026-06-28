@@ -1,5 +1,6 @@
+// src/modules/auth/pages/CadastroPage.jsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // CORRIGIDO: importa Link
+import { Link } from 'react-router-dom';
 import { useCadastro } from '../hooks/useCadastro';
 import '../styles/login.css';
 
@@ -10,6 +11,8 @@ function CadastroPage() {
     senha, setSenha,
     confirmaSenha, setConfirmaSenha,
     showError,
+    erroApi,
+    carregando,
     nomeTouched, setNomeTouched,
     emailTouched, setEmailTouched,
     senhaTouched, setSenhaTouched,
@@ -122,19 +125,26 @@ function CadastroPage() {
             </span>
           </div>
 
-          <button type="submit" className="btn-login">
-            🧭 Criar conta
+          <button type="submit" className="btn-login" disabled={carregando}>
+            {carregando ? '⏳ Criando conta...' : '🧭 Criar conta'}
           </button>
 
+          {/* Erro de validação dos campos */}
           <div id="msg-erro" className={showError ? 'visible' : ''}>
             ⚠️ Preencha todos os campos corretamente.
           </div>
+
+          {/* Erro vindo da API (ex: e-mail já cadastrado) */}
+          {erroApi && (
+            <div id="msg-erro" className="visible" style={{ marginTop: '8px' }}>
+              ⚠️ {erroApi}
+            </div>
+          )}
 
         </form>
 
         <div className="login-footer">
           <p className="cadastro-link">
-            {/* CORRIGIDO: era <a href="/login">, causava reload da página */}
             Já tem uma conta? <Link to="/login">Entrar</Link>
           </p>
         </div>
