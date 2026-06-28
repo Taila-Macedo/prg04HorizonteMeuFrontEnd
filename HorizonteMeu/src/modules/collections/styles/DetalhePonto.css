@@ -1,7 +1,3 @@
-/* ══════════════════════════════════════════════
-   DETALHE PONTO
-   ══════════════════════════════════════════════ */
-
 .detalhe-loading {
   width: 100vw;
   height: 100vh;
@@ -271,6 +267,7 @@
 }
 
 /* ── COMENTÁRIOS ── */
+/* Estilos movidos para src/modules/comments/styles/Comentarios.css */
 .detalhe-comentarios {
   display: flex;
   flex-direction: column;
@@ -525,99 +522,7 @@
   font-size: 0.88rem;
 }
 
-/* ── MODAL DE DENÚNCIA ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 12, 25, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.modal-box {
-  background: var(--azul-escuro);
-  border: 1px solid rgba(26, 58, 107, 0.8);
-  border-radius: 20px;
-  padding: 28px;
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal-header h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  color: var(--branco);
-  margin: 0;
-}
-
-.modal-fechar {
-  background: none;
-  border: none;
-  color: rgba(244, 244, 244, 0.5);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
-}
-
-.modal-fechar:hover { color: var(--branco); }
-
-.modal-descricao {
-  font-size: 0.85rem;
-  color: rgba(244, 244, 244, 0.55);
-  margin: 0;
-}
-
-.modal-opcoes {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.modal-opcao {
-  padding: 10px 16px;
-  background: rgba(10, 22, 40, 0.6);
-  border: 1.5px solid rgba(26, 58, 107, 0.6);
-  border-radius: 10px;
-  color: rgba(244, 244, 244, 0.7);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-opcao:hover { border-color: rgba(244, 244, 244, 0.3); color: var(--branco); }
-.modal-opcao.selecionada { border-color: var(--dourado); color: var(--branco); background: rgba(240, 165, 0, 0.1); }
-
-.btn-enviar-denuncia {
-  padding: 11px;
-  background: var(--dourado);
-  border: none;
-  border-radius: 10px;
-  color: #0a1628;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-enviar-denuncia:hover { background: var(--dourado-claro); }
-.btn-enviar-denuncia:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── MODAL DE DENÚNCIA — estilos em Comentarios.css ── */
 
 /* ── RESPONSIVO ── */
 @media (max-width: 600px) {
@@ -699,4 +604,267 @@
   0%   { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
   40%  { opacity: 0.5; transform: translate(-50%, -50%) scale(2); }
   100% { opacity: 0;   transform: translate(-50%, -50%) scale(4); }
+}
+
+/* ══════════════════════════════════════════════
+   MODAIS — enviar foto e adicionar ao roteiro
+   ══════════════════════════════════════════════ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: #0d1f3c;
+  border: 1px solid rgba(26, 58, 107, 0.8);
+  border-radius: 16px;
+  padding: 28px;
+  width: 440px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: modalEntrar 0.25s ease;
+}
+
+@keyframes modalEntrar {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--branco);
+  margin: 0;
+}
+
+.modal-fechar {
+  background: none;
+  border: none;
+  color: rgba(244, 244, 244, 0.4);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  transition: color 0.2s;
+}
+
+.modal-fechar:hover { color: var(--branco); }
+
+.modal-descricao {
+  font-size: 0.88rem;
+  color: rgba(244, 244, 244, 0.55);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-descricao strong { color: rgba(244, 244, 244, 0.85); }
+
+/* ── Dropzone de foto ── */
+.modal-dropzone {
+  border: 2px dashed rgba(26, 58, 107, 0.8);
+  border-radius: 12px;
+  padding: 36px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  color: rgba(244, 244, 244, 0.35);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  min-height: 140px;
+}
+
+.modal-dropzone:hover {
+  border-color: rgba(240, 165, 0, 0.5);
+  color: rgba(244, 244, 244, 0.6);
+  background: rgba(240, 165, 0, 0.04);
+}
+
+.modal-dropzone.com-preview {
+  padding: 0;
+  overflow: hidden;
+  border-style: solid;
+  border-color: rgba(26, 58, 107, 0.6);
+}
+
+.modal-dropzone span {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.modal-dropzone small {
+  font-size: 0.75rem;
+  color: rgba(244, 244, 244, 0.25);
+}
+
+.modal-foto-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.modal-trocar-foto {
+  background: none;
+  border: 1px solid rgba(26, 58, 107, 0.5);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: rgba(244, 244, 244, 0.45);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.modal-trocar-foto:hover {
+  border-color: rgba(26, 58, 107, 0.9);
+  color: var(--branco);
+}
+
+/* ── Lista de roteiros ── */
+.modal-roteiros-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.modal-roteiro-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(10, 22, 40, 0.5);
+  border: 1.5px solid rgba(26, 58, 107, 0.5);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+
+.modal-roteiro-item:hover {
+  border-color: rgba(26, 58, 107, 0.9);
+  background: rgba(26, 58, 107, 0.2);
+}
+
+.modal-roteiro-item.selecionado {
+  border-color: var(--dourado);
+  background: rgba(240, 165, 0, 0.08);
+}
+
+.modal-roteiro-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.modal-roteiro-titulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--branco);
+}
+
+.modal-roteiro-pontos {
+  font-size: 0.75rem;
+  color: rgba(244, 244, 244, 0.4);
+}
+
+.modal-roteiro-check {
+  color: var(--dourado);
+  flex-shrink: 0;
+}
+
+/* ── Sem roteiros ── */
+.modal-sem-roteiros {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0 8px;
+  color: rgba(244, 244, 244, 0.3);
+  text-align: center;
+}
+
+.modal-sem-roteiros p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+/* ── Sucesso ── */
+.modal-sucesso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 8px;
+  text-align: center;
+}
+
+.modal-sucesso-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1.5px solid rgba(52, 211, 153, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #34d399;
+}
+
+.modal-sucesso p {
+  font-size: 0.92rem;
+  color: rgba(244, 244, 244, 0.75);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.modal-sucesso span {
+  font-size: 0.8rem;
+  color: rgba(244, 244, 244, 0.4);
+}
+
+/* ── Botão de ação principal do modal ── */
+.btn-enviar-modal {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+  border: none;
+  border-radius: 10px;
+  color: #0a1628;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.15s;
+}
+
+.btn-enviar-modal:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.btn-enviar-modal:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }

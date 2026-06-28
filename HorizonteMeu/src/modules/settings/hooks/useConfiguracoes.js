@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useUploadFoto } from '../../../shared/hooks/useUploadFoto';
 
 function calcularForca(senha) {
   if (!senha) return { nivel: 'vazia', texto: '' };
@@ -18,6 +19,7 @@ function calcularForca(senha) {
 export function useConfiguracoes() {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
+  const { uploadFoto, carregando: enviandoFoto } = useUploadFoto();
 
   const [abaAtiva, setAbaAtiva] = useState('perfil');
   const [salvando, setSalvando] = useState(false);
@@ -25,6 +27,7 @@ export function useConfiguracoes() {
   // ── Editar Perfil ──
   const [perfil, setPerfil] = useState({ nome: '', email: '', bio: '' });
   const [toastPerfil, setToastPerfil] = useState('');
+  const [fotoPerfilPreview, setFotoPerfilPreview] = useState(null);
 
   useEffect(() => {
     if (usuario) {
@@ -43,6 +46,20 @@ export function useConfiguracoes() {
     setSalvando(false);
     setToastPerfil('Perfil atualizado com sucesso!');
     setTimeout(() => setToastPerfil(''), 3000);
+  };
+
+  const handleAlterarFotoPerfil = async (arquivo) => {
+    if (!arquivo) return;
+    setFotoPerfilPreview(URL.createObjectURL(arquivo));
+
+    const resultado = await uploadFoto({
+      arquivo,
+      idUsuario: usuario?.id,
+    });
+
+    if (resultado) {
+      // TODO: atualizar usuário no contexto com resultado.url
+    }
   };
 
   // ── Notificações ──
@@ -102,6 +119,7 @@ export function useConfiguracoes() {
   return {
     abaAtiva, setAbaAtiva, salvando,
     perfil, setPerfil, toastPerfil, handleSalvarPerfil,
+    fotoPerfilPreview, enviandoFoto, handleAlterarFotoPerfil,
     notifs, toggleNotif,
     senha, setSenha, mostrarSenhas, toggleMostrarSenha, forcaSenha, toastSenha, handleAlterarSenha,
     excluir, setExcluir, handleExcluirConta,

@@ -67,14 +67,29 @@ export default function Configuracoes() {
 
                 <div className="cfg-avatar-wrapper">
                   <div className="cfg-avatar">
-                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                    </svg>
+                    {cfg.fotoPerfilPreview ? (
+                      <img
+                        src={cfg.fotoPerfilPreview}
+                        alt="Foto de perfil"
+                        style={{ width: '52px', height: '52px', borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                      </svg>
+                    )}
                   </div>
-                  <button className="cfg-alterar-foto">
-                    <Camera size={14} /> Alterar foto
-                  </button>
+                  <label className="cfg-alterar-foto" style={{ cursor: 'pointer' }}>
+                    <Camera size={14} />
+                    {cfg.enviandoFoto ? 'Enviando...' : 'Alterar foto'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => cfg.handleAlterarFotoPerfil(e.target.files[0])}
+                    />
+                  </label>
                 </div>
 
                 <div className="cfg-campos">
@@ -158,8 +173,8 @@ export default function Configuracoes() {
               <div className="cfg-card">
                 <div className="cfg-campos">
                   {[
-                    { campo: 'atual',     placeholder: 'Digite sua senha atual',         label: 'Senha atual' },
-                    { campo: 'nova',      placeholder: 'Digite sua nova senha',          label: 'Nova senha' },
+                    { campo: 'atual',     placeholder: 'Digite sua senha atual',          label: 'Senha atual' },
+                    { campo: 'nova',      placeholder: 'Digite sua nova senha',           label: 'Nova senha' },
                     { campo: 'confirmar', placeholder: 'Digite novamente sua nova senha', label: 'Confirmar nova senha' },
                   ].map(({ campo, placeholder, label }) => (
                     <div key={campo} className="cfg-campo-grupo">
