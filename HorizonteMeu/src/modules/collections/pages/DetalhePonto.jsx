@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, BookOpen, Edit2, Trash2 } from 'lucide-react';
+import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, BookOpen, Edit2 } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
 import { ComentariosSecao } from '../../comments/components/ComentariosSecao';
@@ -30,7 +30,7 @@ export default function DetalhePonto() {
   const navigate = useNavigate();
   const navRef = useRef(null);
   const btnFavoritarRef = useRef(null);
-  const { usuario, token } = useAuth();
+  const { usuario } = useAuth();
   const { uploadFoto } = useUploadFoto();
 
   const [ponto, setPonto] = useState(null);
@@ -45,6 +45,7 @@ export default function DetalhePonto() {
   const [modalFoto, setModalFoto] = useState(false);
   const [fotoSelecionada, setFotoSelecionada] = useState(null);
   const [fotoPreview, setFotoPreview] = useState(null);
+  const [legenda, setLegenda] = useState('');
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [fotoEnviada, setFotoEnviada] = useState(false);
 
@@ -56,7 +57,6 @@ export default function DetalhePonto() {
 
   const isAdmin = usuario?.perfil === 'ADMINISTRADOR';
 
-  // Carrega o ponto da API
   useEffect(() => {
     const carregarPonto = async () => {
       try {
@@ -68,14 +68,11 @@ export default function DetalhePonto() {
           headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!res.ok) {
-          throw new Error('Ponto turístico não encontrado.');
-        }
+        if (!res.ok) throw new Error('Ponto turístico não encontrado.');
 
         const ponto = await res.json();
         setPonto(ponto);
 
-        // Carrega fotos do ponto
         const resFotos = await fetch(`${BASE}/fotos/ponto/${id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -104,6 +101,7 @@ export default function DetalhePonto() {
   const abrirModalFoto = () => {
     setFotoSelecionada(null);
     setFotoPreview(null);
+    setLegenda('');
     setFotoEnviada(false);
     setModalFoto(true);
   };
@@ -123,13 +121,17 @@ export default function DetalhePonto() {
       arquivo: fotoSelecionada,
       idUsuario: usuario?.id,
       idPontoTuristico: Number(id),
+      legenda: legenda.trim(),
     });
 
     setEnviandoFoto(false);
 
     if (resultado) {
       setFotoEnviada(true);
-      setTimeout(() => setModalFoto(false), 1500);
+      setTimeout(() => {
+        setModalFoto(false);
+        // Opcional: recarregar fotos após envio (embora precise de aprovação admin)
+      }, 1500);
     }
   };
 
@@ -137,6 +139,7 @@ export default function DetalhePonto() {
     setModalFoto(false);
     setFotoSelecionada(null);
     setFotoPreview(null);
+    setLegenda('');
     setFotoEnviada(false);
   };
 
@@ -144,7 +147,6 @@ export default function DetalhePonto() {
     setRoteiroSelecionado(null);
     setAdicionado(false);
     setModalRoteiro(true);
-    // TODO: carregar roteiros do usuário via API
     setRoteiros([
       { id: 1, titulo: 'Férias de verão na Europa', quantidadePontos: 8 },
       { id: 2, titulo: 'Explorando o Nordeste', quantidadePontos: 5 },
@@ -163,7 +165,6 @@ export default function DetalhePonto() {
 
   const toggleFavorito = () => {
     if (favoritado) { setFavoritado(false); return; }
-
     const origem = btnFavoritarRef.current?.getBoundingClientRect();
     const destino = navRef.current?.getPosicaoCoracao();
 
@@ -183,10 +184,6 @@ export default function DetalhePonto() {
     } else {
       setFavoritado(true);
     }
-  };
-
-  const handleEditar = () => {
-    navigate(`/pontos/${id}/editar`);
   };
 
   if (carregando) {
@@ -209,7 +206,6 @@ export default function DetalhePonto() {
 
   return (
     <div className="detalhe-container">
-
       {avioes.map((aviao) => (
         <AviaoAnimado key={aviao.id} {...aviao} />
       ))}
@@ -246,7 +242,6 @@ export default function DetalhePonto() {
       </div>
 
       <div className="detalhe-main">
-
         <div className="detalhe-cabecalho">
           <div className="detalhe-cabecalho-info">
             <h1 className="detalhe-nome">{ponto.nome}</h1>
@@ -266,34 +261,31 @@ export default function DetalhePonto() {
             ref={btnFavoritarRef}
             className={`btn-acao ${favoritado ? 'ativo-vermelho' : ''}`}
             onClick={toggleFavorito}
-            title={favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           >
             <Heart size={17} fill={favoritado ? 'currentColor' : 'none'} />
             {favoritado ? 'Favoritado' : 'Favoritar'}
           </button>
 
-          <button className="btn-acao ativo-azul" onClick={abrirGoogleMaps} title="Ver no Google Maps">
+          <button className="btn-acao ativo-azul" onClick={abrirGoogleMaps}>
             <Map size={17} />
             Ver no mapa
           </button>
 
-          <button className="btn-acao" onClick={abrirModalFoto} title="Enviar uma foto deste lugar">
+          <button className="btn-acao" onClick={abrirModalFoto}>
             <Camera size={17} />
             Enviar foto
           </button>
 
-          <button className="btn-acao" onClick={abrirModalRoteiro} title="Adicionar a um roteiro">
+          <button className="btn-acao" onClick={abrirModalRoteiro}>
             <Route size={17} />
             Add. ao roteiro
           </button>
 
           {isAdmin && (
-            <>
-              <button className="btn-acao ativo-amarelo" onClick={handleEditar} title="Editar ponto">
-                <Edit2 size={17} />
-                Editar
-              </button>
-            </>
+            <button className="btn-acao ativo-amarelo" onClick={() => navigate(`/pontos/${id}/editar`)}>
+              <Edit2 size={17} />
+              Editar
+            </button>
           )}
         </div>
 
@@ -309,7 +301,7 @@ export default function DetalhePonto() {
         </div>
       </div>
 
-      {/* ── Modal enviar foto ── */}
+      {/* Modal Enviar Foto */}
       {modalFoto && (
         <div className="modal-overlay" onClick={fecharModalFoto}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -355,9 +347,18 @@ export default function DetalhePonto() {
                 />
 
                 {fotoPreview && (
-                  <button className="modal-trocar-foto" onClick={() => fotoInputRef.current?.click()}>
-                    Trocar foto
-                  </button>
+                  <div className="modal-legenda-container">
+                    <label className="modal-label">Legenda (opcional)</label>
+                    <input
+                      className="modal-input"
+                      type="text"
+                      placeholder="Ex: Um pôr do sol inesquecível..."
+                      value={legenda}
+                      onChange={(e) => setLegenda(e.target.value)}
+                      maxLength={100}
+                    />
+                    <span className="modal-contador">{legenda.length}/100</span>
+                  </div>
                 )}
 
                 <button
@@ -373,7 +374,7 @@ export default function DetalhePonto() {
         </div>
       )}
 
-      {/* ── Modal adicionar ao roteiro ── */}
+      {/* Modal Roteiro */}
       {modalRoteiro && (
         <div className="modal-overlay" onClick={() => setModalRoteiro(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>

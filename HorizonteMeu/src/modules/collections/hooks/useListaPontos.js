@@ -18,9 +18,13 @@ export function useListaPontos() {
         
         // GET /pontos retorna Page<PontoTuristicoGetResponseDto>
         // Estrutura: { content: [...], totalElements, totalPages, ... }
+        const token = localStorage.getItem('hm_token');
         const res = await fetch(`${BASE}/pontos?page=0&size=100`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          },
         });
 
         if (!res.ok) {

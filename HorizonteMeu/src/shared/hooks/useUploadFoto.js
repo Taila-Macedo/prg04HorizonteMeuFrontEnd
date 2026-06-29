@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 export function useUploadFoto() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState(null);
@@ -17,9 +19,10 @@ export function useUploadFoto() {
       if (idPontoTuristico) formData.append("idPontoTuristico", idPontoTuristico);
       if (legenda) formData.append("legenda", legenda);
 
-      const token = localStorage.getItem("token");
+      // Busca o token correto do localStorage conforme padrão do AuthContext
+      const token = localStorage.getItem("hm_token");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/fotos`, {
+      const response = await fetch(`${BASE}/fotos`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,7 +31,16 @@ export function useUploadFoto() {
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Erro ao enviar foto");
+      if (!response.ok) {
+        let mensagem = "Erro ao enviar foto";
+        try {
+          const erroApi = await response.json();
+          mensagem = erroApi.message || erroApi.erro || mensagem;
+        } catch {
+          // não é JSON
+        }
+        throw new Error(mensagem);
+      }
 
       return await response.json(); // retorna a foto salva com a URL do Cloudinary
     } catch (e) {
