@@ -15,7 +15,7 @@ const CATEGORIAS = [
 export default function AdicionarPonto() {
   const {
     form, touched,
-    erros, salvando,
+    erros, salvando, erroApi,
     handleChange, handleBlur, handleSubmit, handleCancelar,
   } = useAdicionarPonto();
 
@@ -158,6 +158,13 @@ export default function AdicionarPonto() {
             </a>{' '}
             clicando com o botão direito no local.
           </p>
+
+          {/* Erro da API */}
+          {erroApi && (
+            <div className="campo-erro-api">
+              ⚠️ {erroApi}
+            </div>
+          )}
 
           {/* Ações */}
           <div className="form-ponto-acoes">

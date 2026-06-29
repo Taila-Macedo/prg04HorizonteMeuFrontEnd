@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../shared/contexts/AuthContext';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const FORM_INICIAL = {
   nome: '',
@@ -32,15 +35,19 @@ function validar(form) {
 
 export function useAdicionarPonto() {
   const navigate = useNavigate();
+  const { token } = useAuth();
+  
   const [form, setForm] = useState(FORM_INICIAL);
   const [touched, setTouched] = useState({});
   const [salvando, setSalvando] = useState(false);
+  const [erroApi, setErroApi] = useState('');
 
   const erros = validar(form);
 
   const handleChange = (campo, valor) => {
     setForm((prev) => ({ ...prev, [campo]: valor }));
     setTouched((prev) => ({ ...prev, [campo]: true }));
+    setErroApi('');
   };
 
   const handleBlur = (campo) => {
@@ -56,14 +63,46 @@ export function useAdicionarPonto() {
     if (Object.keys(erros).length > 0) return;
 
     setSalvando(true);
+    setErroApi('');
 
-    // TODO: integrar com POST /pontos quando a API estiver pronta
-    // Body: { nome, categoria, descricao, cidade, pais, latitude, longitude }
-    // A notaMedia é iniciada em 0.0 pelo backend automaticamente (RN04)
-    await new Promise((res) => setTimeout(res, 700));
+    try {
+      const payload = {
+        nome: form.nome.trim(),
+        categoria: form.categoria,
+        descricao: form.descricao.trim(),
+        cidade: form.cidade.trim(),
+        pais: form.pais.trim(),
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+      };
 
-    setSalvando(false);
-    navigate('/pontos');
+      const res = await fetch(`${BASE}/pontos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        let mensagem = 'Erro ao criar ponto turístico.';
+        try {
+          const erro = await res.json();
+          mensagem = erro.message || erro.erro || mensagem;
+        } catch {
+          // resposta não era JSON
+        }
+        throw new Error(mensagem);
+      }
+
+      // Ponto criado com sucesso — redireciona para listagem
+      navigate('/pontos');
+    } catch (err) {
+      setErroApi(err.message || 'Erro ao criar ponto turístico. Tente novamente.');
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const handleCancelar = () => navigate('/pontos');
@@ -73,6 +112,7 @@ export function useAdicionarPonto() {
     touched,
     erros,
     salvando,
+    erroApi,
     handleChange,
     handleBlur,
     handleSubmit,

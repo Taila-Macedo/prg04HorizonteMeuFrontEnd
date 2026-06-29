@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, BookOpen } from 'lucide-react';
+import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, BookOpen, Edit2, Trash2 } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
-import { PONTOS_MOCK, FOTOS_MOCK, CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
+import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
 import { ComentariosSecao } from '../../comments/components/ComentariosSecao';
 import { useUploadFoto } from '../../../shared/hooks/useUploadFoto';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import '../styles/DetalhePonto.css';
 
-const PONTOS_POR_ID = Object.values(PONTOS_MOCK)
-  .flat()
-  .reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function Estrelas({ nota, tamanho = 16 }) {
   return (
@@ -32,7 +30,7 @@ export default function DetalhePonto() {
   const navigate = useNavigate();
   const navRef = useRef(null);
   const btnFavoritarRef = useRef(null);
-  const { usuario } = useAuth();
+  const { usuario, token } = useAuth();
   const { uploadFoto } = useUploadFoto();
 
   const [ponto, setPonto] = useState(null);
@@ -41,6 +39,7 @@ export default function DetalhePonto() {
   const [favoritado, setFavoritado] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [avioes, setAvioes] = useState([]);
+  const [erroCarregamento, setErroCarregamento] = useState('');
 
   const fotoInputRef = useRef(null);
   const [modalFoto, setModalFoto] = useState(false);
@@ -55,14 +54,46 @@ export default function DetalhePonto() {
   const [adicionando, setAdicionando] = useState(false);
   const [adicionado, setAdicionado] = useState(false);
 
+  const isAdmin = usuario?.perfil === 'ADMINISTRADOR';
+
+  // Carrega o ponto da API
   useEffect(() => {
-    setTimeout(() => {
-      const pontoEncontrado = PONTOS_POR_ID[Number(id)];
-      const fotosEncontradas = FOTOS_MOCK[Number(id)] ?? FOTOS_MOCK[1];
-      setPonto(pontoEncontrado ?? null);
-      setFotos(fotosEncontradas);
-      setCarregando(false);
-    }, 400);
+    const carregarPonto = async () => {
+      try {
+        setCarregando(true);
+        setErroCarregamento('');
+
+        const res = await fetch(`${BASE}/pontos/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!res.ok) {
+          throw new Error('Ponto turístico não encontrado.');
+        }
+
+        const ponto = await res.json();
+        setPonto(ponto);
+
+        // Carrega fotos do ponto
+        const resFotos = await fetch(`${BASE}/fotos/ponto/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (resFotos.ok) {
+          const fotosList = await resFotos.json();
+          setFotos(Array.isArray(fotosList) ? fotosList : []);
+        }
+      } catch (err) {
+        setErroCarregamento(err.message || 'Erro ao carregar ponto turístico.');
+        setPonto(null);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    carregarPonto();
   }, [id]);
 
   const abrirGoogleMaps = () => {
@@ -113,6 +144,7 @@ export default function DetalhePonto() {
     setRoteiroSelecionado(null);
     setAdicionado(false);
     setModalRoteiro(true);
+    // TODO: carregar roteiros do usuário via API
     setRoteiros([
       { id: 1, titulo: 'Férias de verão na Europa', quantidadePontos: 8 },
       { id: 2, titulo: 'Explorando o Nordeste', quantidadePontos: 5 },
@@ -153,6 +185,10 @@ export default function DetalhePonto() {
     }
   };
 
+  const handleEditar = () => {
+    navigate(`/pontos/${id}/editar`);
+  };
+
   if (carregando) {
     return (
       <div className="detalhe-loading">
@@ -165,8 +201,8 @@ export default function DetalhePonto() {
   if (!ponto) {
     return (
       <div className="detalhe-loading">
-        <p>Ponto turístico não encontrado.</p>
-        <button onClick={() => navigate('/dashboard')}>Voltar</button>
+        <p>{erroCarregamento || 'Ponto turístico não encontrado.'}</p>
+        <button onClick={() => navigate('/pontos')}>Voltar</button>
       </div>
     );
   }
@@ -205,7 +241,7 @@ export default function DetalhePonto() {
           </div>
         )}
         <span className="detalhe-categoria-badge">
-          {CATEGORIA_LABEL[ponto.categoriaEnum] || ponto.categoria}
+          {CATEGORIA_LABEL[ponto.categoria] || ponto.categoria}
         </span>
       </div>
 
@@ -250,6 +286,15 @@ export default function DetalhePonto() {
             <Route size={17} />
             Add. ao roteiro
           </button>
+
+          {isAdmin && (
+            <>
+              <button className="btn-acao ativo-amarelo" onClick={handleEditar} title="Editar ponto">
+                <Edit2 size={17} />
+                Editar
+              </button>
+            </>
+          )}
         </div>
 
         <p className="detalhe-descricao">{ponto.descricao}</p>

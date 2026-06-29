@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Search, SlidersHorizontal, Plus } from 'lucide-react';
+import { MapPin, Star, Search, SlidersHorizontal, Plus, AlertCircle } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { useListaPontos } from '../hooks/useListaPontos';
 import { useAuth } from '../../../shared/contexts/AuthContext';
@@ -22,8 +22,8 @@ function Estrelas({ nota }) {
         <Star
           key={n}
           size={12}
-          className={n <= Math.round(nota) ? 'estrela-ativa' : 'estrela-vazia'}
-          fill={n <= Math.round(nota) ? 'currentColor' : 'none'}
+          className={n <= Math.round(nota || 0) ? 'estrela-ativa' : 'estrela-vazia'}
+          fill={n <= Math.round(nota || 0) ? 'currentColor' : 'none'}
         />
       ))}
     </div>
@@ -38,6 +38,7 @@ export default function ListaPontos() {
   const {
     pontos,
     loading,
+    erro,
     busca,
     setBusca,
     categoriaAtiva,
@@ -91,13 +92,24 @@ export default function ListaPontos() {
           ))}
         </div>
 
+        {/* Estado de Erro */}
+        {erro && (
+          <div className="lp-erro">
+            <AlertCircle size={40} />
+            <p>{erro}</p>
+            <button className="btn-recarregar" onClick={() => window.location.reload()}>
+              Tentar novamente
+            </button>
+          </div>
+        )}
+
         {/* Estado de loading */}
-        {loading ? (
+        {!erro && loading ? (
           <div className="lp-loading">
             <div className="lp-spinner" />
             <p>Carregando pontos turísticos...</p>
           </div>
-        ) : pontos.length === 0 ? (
+        ) : !erro && pontos.length === 0 ? (
           <div className="lp-vazio">
             <MapPin size={40} />
             <p>Nenhum ponto encontrado para sua busca.</p>
@@ -105,7 +117,7 @@ export default function ListaPontos() {
               Limpar filtros
             </button>
           </div>
-        ) : (
+        ) : !erro && (
           <>
             <p className="lp-contagem">{pontos.length} ponto{pontos.length !== 1 ? 's' : ''} encontrado{pontos.length !== 1 ? 's' : ''}</p>
             <div className="lp-grid">
@@ -123,7 +135,9 @@ export default function ListaPontos() {
                         <MapPin size={28} />
                       </div>
                     )}
-                    <span className="lp-card-categoria">{ponto.categoria}</span>
+                    <span className="lp-card-categoria">
+                      {CATEGORIA_LABEL[ponto.categoria] || ponto.categoria}
+                    </span>
                   </div>
 
                   <div className="lp-card-body">
@@ -135,7 +149,7 @@ export default function ListaPontos() {
                     <p className="lp-card-descricao">{ponto.descricao}</p>
                     <div className="lp-card-footer">
                       <Estrelas nota={ponto.notaMedia} />
-                      <span className="lp-card-nota">{ponto.notaMedia?.toFixed(1)}</span>
+                      <span className="lp-card-nota">{ponto.notaMedia?.toFixed(1) || '0.0'}</span>
                     </div>
                   </div>
                 </div>

@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PONTOS_MOCK } from '../../../shared/mocks/mockData';
+import { useAuth } from '../../../shared/contexts/AuthContext';
 
-// Achata todos os pontos em um objeto indexado por id
-const PONTOS_POR_ID = Object.values(PONTOS_MOCK)
-  .flat()
-  .reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function validar(form) {
   const erros = {};
@@ -29,6 +26,7 @@ function validar(form) {
 export function useEditarPonto() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const [form, setForm] = useState({
     nome: '', categoria: '', descricao: '', cidade: '', pais: '', latitude: '', longitude: '',
@@ -37,24 +35,42 @@ export function useEditarPonto() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [confirmandoDeletar, setConfirmandoDeletar] = useState(false);
+  const [erroApi, setErroApi] = useState('');
 
+  // Carrega o ponto da API na montagem
   useEffect(() => {
-    // TODO: substituir por GET /pontos/{id}
-    setTimeout(() => {
-      const ponto = PONTOS_POR_ID[Number(id)];
-      if (ponto) {
+    const carregarPonto = async () => {
+      try {
+        setCarregando(true);
+        setErroApi('');
+
+        const res = await fetch(`${BASE}/pontos/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!res.ok) {
+          throw new Error('Ponto turístico não encontrado.');
+        }
+
+        const ponto = await res.json();
         setForm({
           nome: ponto.nome ?? '',
-          categoria: ponto.categoriaEnum ?? '',
+          categoria: ponto.categoria ?? '',
           descricao: ponto.descricao ?? '',
           cidade: ponto.cidade ?? '',
           pais: ponto.pais ?? '',
           latitude: ponto.latitude?.toString() ?? '',
           longitude: ponto.longitude?.toString() ?? '',
         });
+      } catch (err) {
+        setErroApi(err.message || 'Erro ao carregar ponto turístico.');
+      } finally {
+        setCarregando(false);
       }
-      setCarregando(false);
-    }, 400);
+    };
+
+    carregarPonto();
   }, [id]);
 
   const erros = validar(form);
@@ -62,6 +78,7 @@ export function useEditarPonto() {
   const handleChange = (campo, valor) => {
     setForm((prev) => ({ ...prev, [campo]: valor }));
     setTouched((prev) => ({ ...prev, [campo]: true }));
+    setErroApi('');
   };
 
   const handleBlur = (campo) => {
@@ -76,14 +93,46 @@ export function useEditarPonto() {
     if (Object.keys(erros).length > 0) return;
 
     setSalvando(true);
+    setErroApi('');
 
-    // TODO: integrar com PUT /pontos/{id}
-    // Body: { nome, categoria, descricao, cidade, pais, latitude, longitude }
-    // notaMedia NÃO deve ser enviada — o backend recalcula automaticamente (RN04)
-    await new Promise((res) => setTimeout(res, 700));
+    try {
+      const payload = {
+        nome: form.nome.trim(),
+        categoria: form.categoria,
+        descricao: form.descricao.trim(),
+        cidade: form.cidade.trim(),
+        pais: form.pais.trim(),
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+      };
 
-    setSalvando(false);
-    navigate(`/pontos/${id}`);
+      const res = await fetch(`${BASE}/pontos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        let mensagem = 'Erro ao atualizar ponto turístico.';
+        try {
+          const erro = await res.json();
+          mensagem = erro.message || erro.erro || mensagem;
+        } catch {
+          // resposta não era JSON
+        }
+        throw new Error(mensagem);
+      }
+
+      // Ponto atualizado com sucesso — redireciona para detalhe
+      navigate(`/pontos/${id}`);
+    } catch (err) {
+      setErroApi(err.message || 'Erro ao atualizar ponto turístico. Tente novamente.');
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const handleCancelar = () => navigate(`/pontos/${id}`);
@@ -93,16 +142,40 @@ export function useEditarPonto() {
 
   const confirmarDeletar = async () => {
     setSalvando(true);
-    // TODO: integrar com DELETE /pontos/{id}
-    await new Promise((res) => setTimeout(res, 500));
-    setSalvando(false);
-    navigate('/pontos');
+    setErroApi('');
+
+    try {
+      const res = await fetch(`${BASE}/pontos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        let mensagem = 'Erro ao excluir ponto turístico.';
+        try {
+          const erro = await res.json();
+          mensagem = erro.message || erro.erro || mensagem;
+        } catch {
+          // resposta não era JSON
+        }
+        throw new Error(mensagem);
+      }
+
+      // Ponto excluído com sucesso — redireciona para listagem
+      navigate('/pontos');
+    } catch (err) {
+      setErroApi(err.message || 'Erro ao excluir ponto turístico. Tente novamente.');
+      setSalvando(false);
+    }
   };
 
   return {
     form, touched, erros,
     salvando, carregando,
     confirmandoDeletar,
+    erroApi,
     handleChange, handleBlur, handleSubmit, handleCancelar,
     pedirConfirmacaoDeletar, confirmarDeletar, cancelarDeletar,
   };

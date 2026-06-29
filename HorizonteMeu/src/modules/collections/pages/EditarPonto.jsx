@@ -15,7 +15,7 @@ const CATEGORIAS = [
 export default function EditarPonto() {
   const {
     form, touched,
-    erros, salvando,
+    erros, salvando, erroApi,
     carregando, confirmandoDeletar,
     handleChange, handleBlur, handleSubmit, handleCancelar,
     pedirConfirmacaoDeletar, confirmarDeletar, cancelarDeletar,
@@ -169,6 +169,13 @@ export default function EditarPonto() {
             </a>{' '}
             clicando com o botão direito no local.
           </p>
+
+          {/* Erro da API */}
+          {erroApi && (
+            <div className="campo-erro-api">
+              ⚠️ {erroApi}
+            </div>
+          )}
 
           {/* Ações */}
           <div className="form-ponto-acoes">
