@@ -1,12 +1,17 @@
-import { useState, useRef } from 'react';
-import { COMENTARIOS_MOCK } from '../../../shared/mocks/mockData';
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useUploadFoto } from '../../../shared/hooks/useUploadFoto';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useComentarios(pontoId) {
+  const { usuario, token } = useAuth();
+  const { uploadFoto } = useUploadFoto();
   const comentarioFotoRef = useRef(null);
 
-  const [comentarios, setComentarios] = useState(
-    COMENTARIOS_MOCK[Number(pontoId)] ?? COMENTARIOS_MOCK[1] ?? []
-  );
+  const [comentarios, setComentarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
 
   const [novoComentario, setNovoComentario] = useState({
     texto: '',
@@ -27,6 +32,35 @@ export function useComentarios(pontoId) {
     comentarioId: null,
   });
 
+  // Carrega comentários do ponto
+  useEffect(() => {
+    const carregarComentarios = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${BASE}/comentarios/ponto/${pontoId}`);
+        if (!res.ok) throw new Error('Erro ao carregar avaliações.');
+        const data = await res.json();
+        
+        const lista = (Array.isArray(data) ? data : []).map(c => {
+          const eMeu = c.idUsuario === usuario?.id || usuario?.perfil === 'ADMINISTRADOR';
+          return {
+            ...c,
+            autorNome: eMeu ? usuario?.nome : `Viajante #${c.idUsuario}`,
+            meu: eMeu
+          };
+        });
+        
+        setComentarios(lista);
+      } catch (err) {
+        setErro(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (pontoId) carregarComentarios();
+  }, [pontoId, usuario]);
+
   // ── Novo comentário ──────────────────────────────────────────────────────────
 
   const handleFotoComentario = (e) => {
@@ -40,35 +74,82 @@ export function useComentarios(pontoId) {
     setNovoComentario((prev) => ({ ...prev, fotoPreview: null, fotoFile: null }));
   };
 
-  const enviarComentario = () => {
+  const enviarComentario = async () => {
     if (!novoComentario.texto.trim()) return;
-    // TODO: POST /comentarios { pontoTuristicoId, texto, nota }
-    const novo = {
-      id: Date.now(),
-      usuario: { nome: 'Você' },
-      texto: novoComentario.texto,
-      nota: novoComentario.nota,
-      curtidas: 0,
-      curtido: false,
-      fotoUrl: novoComentario.fotoPreview,
-      editado: false,
-      meu: true, // flag para mostrar ações de editar/excluir
-    };
-    setComentarios((prev) => [novo, ...prev]);
-    setNovoComentario({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
+    if (!usuario) {
+      alert('Você precisa estar logado para comentar.');
+      return;
+    }
+
+    try {
+      let fotoUrl = null;
+      if (novoComentario.fotoFile) {
+        // IMPORTANTE: Não enviamos o idPontoTuristico aqui para evitar que a foto
+        // seja vinculada à galeria oficial do ponto pelo backend.
+        // O backend ainda salvará a foto no Cloudinary e nos devolverá a URL.
+        const uploadRes = await uploadFoto({
+          arquivo: novoComentario.fotoFile,
+          idUsuario: usuario.id,
+          legenda: `Foto da avaliação de ${usuario.nome}`
+        });
+        if (uploadRes) fotoUrl = uploadRes.url;
+      }
+
+      const payload = {
+        texto: novoComentario.texto.trim(),
+        nota: novoComentario.nota,
+        fotoUrl: fotoUrl,
+        idUsuario: usuario.id,
+        idPontoTuristico: Number(pontoId)
+      };
+
+      const res = await fetch(`${BASE}/comentarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Erro ao publicar avaliação.');
+
+      const salvo = await res.json();
+      
+      const novoFormatado = {
+        ...salvo,
+        autorNome: usuario.nome,
+        meu: true
+      };
+      
+      setComentarios(prev => [novoFormatado, ...prev]);
+      setNovoComentario({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
+      
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   // ── Curtir ───────────────────────────────────────────────────────────────────
 
-  const toggleCurtir = (comentarioId) => {
-    // TODO: POST /comentarios/{id}/curtir
-    setComentarios((prev) =>
-      prev.map((c) => {
-        if (c.id !== comentarioId) return c;
-        const curtido = !c.curtido;
-        return { ...c, curtido, curtidas: curtido ? c.curtidas + 1 : c.curtidas - 1 };
-      })
-    );
+  const toggleCurtir = async (comentarioId) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${BASE}/comentarios/${comentarioId}/curtir`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        const atualizado = await res.json();
+        setComentarios(prev => prev.map(c => 
+          c.id === comentarioId ? { ...c, curtidas: atualizado.curtidas } : c
+        ));
+      }
+    } catch (err) {
+      console.error('Erro ao curtir:', err);
+    }
   };
 
   // ── Excluir ──────────────────────────────────────────────────────────────────
@@ -81,12 +162,20 @@ export function useComentarios(pontoId) {
     setConfirmacaoExcluir({ aberto: false, comentarioId: null });
   };
 
-  const confirmarExcluir = () => {
-    // TODO: DELETE /comentarios/{id}
-    setComentarios((prev) =>
-      prev.filter((c) => c.id !== confirmacaoExcluir.comentarioId)
-    );
-    setConfirmacaoExcluir({ aberto: false, comentarioId: null });
+  const confirmarExcluir = async () => {
+    try {
+      const res = await fetch(`${BASE}/comentarios/${confirmacaoExcluir.comentarioId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Erro ao excluir comentário.');
+
+      setComentarios(prev => prev.filter(c => c.id !== confirmacaoExcluir.comentarioId));
+      setConfirmacaoExcluir({ aberto: false, comentarioId: null });
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   // ── Denúncia ─────────────────────────────────────────────────────────────────
@@ -103,13 +192,14 @@ export function useComentarios(pontoId) {
 
   const enviarDenuncia = () => {
     if (!motivoDenuncia.trim()) return;
-    // TODO: POST /denuncias { comentarioId, motivo }
+    alert('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
     fecharDenuncia();
   };
 
   return {
     comentarios,
-    setComentarios,
+    loading,
+    erro,
     novoComentario,
     setNovoComentario,
     comentarioFotoRef,

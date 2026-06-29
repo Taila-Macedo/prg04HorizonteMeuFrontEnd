@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../shared/contexts/AuthContext';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useEditarComentario() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useAuth();
 
   // O DetalhePonto passa o comentário via state na navegação
   const comentarioOriginal = location.state?.comentario ?? null;
@@ -19,23 +23,43 @@ export function useEditarComentario() {
     setTimeout(() => setToastMsg(''), 3000);
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!texto.trim()) return;
     setSalvando(true);
 
-    // TODO: PUT /comentarios/{comentarioOriginal.id} { texto, nota }
-    setTimeout(() => {
-      setSalvando(false);
+    try {
+      // PUT /comentarios/{id} - Nota é imutável conforme RN119 do controller
+      const payload = {
+        texto: texto.trim(),
+        fotoUrl: comentarioOriginal.fotoUrl // Mantém a foto atual
+      };
+
+      const res = await fetch(`${BASE}/comentarios/${comentarioOriginal.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Erro ao atualizar comentário.');
+
       mostrarToast('Comentário atualizado!');
       setTimeout(() => navigate(`/pontos/${pontoId}`), 1200);
-    }, 600);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const handleCancelar = () => {
     navigate(`/pontos/${pontoId}`);
   };
 
-  const textoAlterado = texto !== comentarioOriginal?.texto || nota !== comentarioOriginal?.nota;
+  //A nota é imutável
+  const textoAlterado = texto !== comentarioOriginal?.texto;
 
   return {
     comentarioOriginal,

@@ -83,10 +83,15 @@ export default function EditarComentario() {
           {/* Nota */}
           <div className="ec-campo">
             <label className="ec-label">Sua nota</label>
-            <EstrelasInterativas nota={nota} onChange={setNota} />
+            <div style={{ opacity: 0.6, pointerEvents: 'none' }}>
+              <EstrelasInterativas nota={nota} onChange={setNota} />
+            </div>
             <span className="ec-nota-texto">
               {['', 'Péssimo', 'Ruim', 'Regular', 'Bom', 'Excelente'][nota]}
             </span>
+            <small style={{ color: 'rgba(255,255,255,0.4)', marginTop: '4px', display: 'block' }}>
+              * A nota não pode ser alterada após a publicação.
+            </small>
           </div>
 
           {/* Texto */}

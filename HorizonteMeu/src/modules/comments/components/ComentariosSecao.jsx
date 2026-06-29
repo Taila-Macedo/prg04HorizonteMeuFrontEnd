@@ -24,6 +24,7 @@ export function ComentariosSecao({ pontoId }) {
 
   const {
     comentarios,
+    loading,
     novoComentario,
     setNovoComentario,
     comentarioFotoRef,
@@ -105,7 +106,9 @@ export function ComentariosSecao({ pontoId }) {
 
       {/* Lista */}
       <div className="comentarios-lista">
-        {comentarios.length === 0 ? (
+        {loading ? (
+          <p className="loading-msg">Carregando avaliações...</p>
+        ) : comentarios.length === 0 ? (
           <div className="comentarios-vazios">
             <MessageCircle size={32} />
             <p>Nenhuma avaliação ainda. Seja o primeiro!</p>
@@ -115,11 +118,11 @@ export function ComentariosSecao({ pontoId }) {
             <div key={c.id} className="comentario-card">
               <div className="comentario-header">
                 <div className="comentario-avatar">
-                  {c.usuario.nome.charAt(0).toUpperCase()}
+                  {(c.autorNome || 'V').charAt(0).toUpperCase()}
                 </div>
                 <div className="comentario-header-info">
                   <div className="comentario-autor-linha">
-                    <span className="comentario-autor">{c.usuario.nome}</span>
+                    <span className="comentario-autor">{c.autorNome}</span>
                     {c.editado && <span className="comentario-editado-badge">editado</span>}
                   </div>
                   <Estrelas nota={c.nota} tamanho={13} />
