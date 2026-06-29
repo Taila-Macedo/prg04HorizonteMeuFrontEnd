@@ -212,18 +212,15 @@
   }
 }
 /* ── CORAÇÃO DE FAVORITOS NO NAV ── */
-.nav-coracao {
-  transition: color 0.3s, fill 0.3s;
-  color: rgba(255,255,255,0.85);
-}
-
-.nav-coracao-ativo {
+/* Coração da navbar pulsando ao favoritar */
+.nav-coracao-pulsando {
   color: #f87171 !important;
-  animation: pulso-coracao 0.4s ease;
+  animation: pulso-coracao 0.4s ease-out;
 }
 
 @keyframes pulso-coracao {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.4); }
+  40%  { transform: scale(1.5); }
+  70%  { transform: scale(0.9); }
   100% { transform: scale(1); }
 }

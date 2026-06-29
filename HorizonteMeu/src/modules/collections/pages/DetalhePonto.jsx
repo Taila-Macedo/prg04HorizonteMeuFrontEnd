@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, Edit2, Send } from 'lucide-react';
+import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, Edit2 } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
 import { ComentariosSecao } from '../../comments/components/ComentariosSecao';
@@ -37,7 +37,7 @@ function AviaoAnimado({ x, y, destinoX, destinoY }) {
         '--end-y': `${destinoY}px`,
       }}
     >
-      <Send size={20} className="aviao-icone" />
+      <span className="aviao-icone" role="img" aria-label="avião">✈️</span>
     </div>
   );
 }
@@ -111,13 +111,16 @@ export default function DetalhePonto() {
           destinoY: destino.top + destino.height / 2,
         };
         setAvioes((prev) => [...prev, novoAviao]);
-        
-        // Dispara a chamada da API junto com a animação
+
         await favoritar(id);
 
         setTimeout(() => {
+          navRef.current?.pulsarCoracao?.();
+        }, 100); // pulsa quando o avião está chegando
+
+        setTimeout(() => {
           setAvioes((prev) => prev.filter((a) => a.id !== novoAviao.id));
-        }, 1100);
+        }, 1100); // remove o avião depois
       } else {
         await favoritar(id);
       }

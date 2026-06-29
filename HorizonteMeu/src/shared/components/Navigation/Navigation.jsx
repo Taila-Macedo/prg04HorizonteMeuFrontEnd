@@ -1,22 +1,25 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, Bell, Sparkles, Route, User, MapPin } from 'lucide-react';
+import { Search, Heart, Bell, Route, User, MapPin } from 'lucide-react';
 import './Navigation.css';
 
-// Navigation exportado com forwardRef para que o DetalhePonto
-// consiga pegar a posição do coração via ref
 export const Navigation = forwardRef(function Navigation(
-  { aoPesquisar, esconderBusca = false, favoritado = false },
+  { aoPesquisar, esconderBusca = false },
   ref
 ) {
   const [pesquisa, setPesquisa] = useState('');
+  const [coracaoPulsando, setCoracaoPulsando] = useState(false);
   const coracaoRef = useRef(null);
 
-  // Expõe a posição do coração para o componente pai
   useImperativeHandle(ref, () => ({
     getPosicaoCoracao: () => {
       if (!coracaoRef.current) return null;
       return coracaoRef.current.getBoundingClientRect();
+    },
+    // Novo método: faz o coração da navbar pulsar por 800ms
+    pulsarCoracao: () => {
+      setCoracaoPulsando(true);
+      setTimeout(() => setCoracaoPulsando(false), 800);
     }
   }));
 
@@ -26,7 +29,6 @@ export const Navigation = forwardRef(function Navigation(
 
   return (
     <header className="navigation-header">
-
       <Link to="/dashboard" className="navigation-logo">
         🧭 <span className="text-logo">Horizonte Meu</span>
       </Link>
@@ -46,7 +48,6 @@ export const Navigation = forwardRef(function Navigation(
       )}
 
       <div className="navigation-actions">
-
         <Link to="/pontos" className="nav-action-btn" title="Explorar Pontos">
           <MapPin size={20} />
         </Link>
@@ -55,16 +56,14 @@ export const Navigation = forwardRef(function Navigation(
           <Route size={20} />
         </Link>
 
-        {/* Coração de favoritos — fica vermelho quando favoritado */}
         <Link to="/favoritos" className="nav-action-btn" title="Favoritos" ref={coracaoRef}>
           <Heart
             size={20}
-            className={`nav-coracao ${favoritado ? 'nav-coracao-ativo' : ''}`}
-            fill={favoritado ? 'currentColor' : 'none'}
+            className={`nav-coracao ${coracaoPulsando ? 'nav-coracao-pulsando' : ''}`}
+            fill={coracaoPulsando ? 'currentColor' : 'none'}
           />
         </Link>
 
-       
         <Link to="/perfil" className="nav-action-btn nav-notificacao" title="Notificações">
           <Bell size={20} />
           <span className="nav-notification-badge"></span>
@@ -75,7 +74,6 @@ export const Navigation = forwardRef(function Navigation(
             <User size={20} color="#ffffff" />
           </div>
         </Link>
-
       </div>
     </header>
   );
