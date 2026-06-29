@@ -2,31 +2,59 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MapPin, Trash2, Search } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
-import { FAVORITOS_MOCK, CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
+import { useFavoritos } from '../hooks/useFavoritos';
+import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData.js';
 import '../styles/Favoritos.css';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Favoritos() {
   const navigate = useNavigate();
-  const [favoritos, setFavoritos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
+  const { favoritos, carregando, removerFavorito } = useFavoritos();
+  const [pontosDetalhados, setPontosDetalhados] = useState([]);
+  const [carregandoDetalhes, setCarregandoDetalhes] = useState(false);
   const [busca, setBusca] = useState('');
   const [confirmandoId, setConfirmandoId] = useState(null);
 
+  // Como o endpoint de favoritos só traz os IDs, precisamos buscar os detalhes de cada ponto
   useEffect(() => {
-    // TODO: GET /favoritos/usuario/{idUsuario}
-    setTimeout(() => {
-      setFavoritos(FAVORITOS_MOCK);
-      setCarregando(false);
-    }, 400);
-  }, []);
+    const carregarDetalhesDosPontos = async () => {
+      if (favoritos.length === 0) {
+        setPontosDetalhados([]);
+        return;
+      }
 
-  const removerFavorito = (favoritoId) => {
-    // TODO: DELETE /favoritos/{id}
-    setFavoritos((prev) => prev.filter((f) => f.id !== favoritoId));
-    setConfirmandoId(null);
+      try {
+        setCarregandoDetalhes(true);
+        const promessas = favoritos.map(async (fav) => {
+          const res = await fetch(`${BASE}/pontos/${fav.idPontoTuristico}`);
+          if (res.ok) {
+            const ponto = await res.json();
+            return { ...fav, pontoTuristico: ponto };
+          }
+          return null;
+        });
+
+        const resultados = await Promise.all(promessas);
+        setPontosDetalhados(resultados.filter(r => r !== null));
+      } catch (err) {
+        console.error('Erro ao carregar detalhes dos favoritos:', err);
+      } finally {
+        setCarregandoDetalhes(false);
+      }
+    };
+
+    carregarDetalhesDosPontos();
+  }, [favoritos]);
+
+  const handleRemover = async (favoritoId) => {
+    const sucesso = await removerFavorito(favoritoId);
+    if (sucesso) {
+      setConfirmandoId(null);
+    }
   };
 
-  const favoritosFiltrados = favoritos.filter((f) => {
+  const favoritosFiltrados = pontosDetalhados.filter((f) => {
     const termo = busca.toLowerCase();
     const p = f.pontoTuristico;
     return (
@@ -35,6 +63,8 @@ export default function Favoritos() {
       p.pais.toLowerCase().includes(termo)
     );
   });
+
+  const isLoading = carregando || carregandoDetalhes;
 
   return (
     <div className="favoritos-container">
@@ -65,14 +95,14 @@ export default function Favoritos() {
           </div>
         )}
 
-        {carregando && (
+        {isLoading && (
           <div className="favoritos-vazio">
             <div className="loading-spinner" />
             <p>Carregando favoritos...</p>
           </div>
         )}
 
-        {!carregando && favoritos.length === 0 && (
+        {!isLoading && favoritos.length === 0 && (
           <div className="favoritos-vazio">
             <Heart size={48} className="vazio-icone" />
             <h2>Nenhum favorito ainda</h2>
@@ -83,14 +113,14 @@ export default function Favoritos() {
           </div>
         )}
 
-        {!carregando && favoritos.length > 0 && favoritosFiltrados.length === 0 && (
+        {!isLoading && favoritos.length > 0 && favoritosFiltrados.length === 0 && (
           <div className="favoritos-vazio">
             <Search size={40} className="vazio-icone" />
             <p>Nenhum favorito encontrado para "{busca}"</p>
           </div>
         )}
 
-        {!carregando && favoritosFiltrados.length > 0 && (
+        {!isLoading && favoritosFiltrados.length > 0 && (
           <div className="favoritos-grid">
             {favoritosFiltrados.map((fav) => {
               const p = fav.pontoTuristico;
@@ -121,12 +151,12 @@ export default function Favoritos() {
                     </div>
 
                     <div className="favorito-footer">
-                      <span className="favorito-nota">★ {p.notaMedia?.toFixed(1)}</span>
+                      <span className="favorito-nota">★ {p.notaMedia?.toFixed(1) || '0.0'}</span>
 
                       {confirmandoId === fav.id ? (
                         <div className="confirmacao">
                           <span>Remover?</span>
-                          <button className="btn-confirmar-sim" onClick={() => removerFavorito(fav.id)}>Sim</button>
+                          <button className="btn-confirmar-sim" onClick={() => handleRemover(fav.id)}>Sim</button>
                           <button className="btn-confirmar-nao" onClick={() => setConfirmandoId(null)}>Não</button>
                         </div>
                       ) : (

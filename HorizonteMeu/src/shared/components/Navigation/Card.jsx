@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Heart, Star, Landmark } from 'lucide-react';
+import { useFavoritos } from '../../../modules/favorites/hooks/useFavoritos';
 import './Card.css';
 
 export default function SpotCard({ item }) {
   const navigate = useNavigate();
+  const { isFavoritado, favoritar, removerFavorito, getFavoritoId } = useFavoritos();
 
   const dados = item || {
     id: 1,
@@ -20,10 +22,22 @@ export default function SpotCard({ item }) {
     if (dados.id) navigate(`/pontos/${dados.id}`);
   };
 
+  const favoritado = isFavoritado(dados.id);
+
+  const handleFavorito = async (e) => {
+    e.stopPropagation();
+    if (favoritado) {
+      const favId = getFavoritoId(dados.id);
+      if (favId) await removerFavorito(favId);
+    } else {
+      await favoritar(dados.id);
+    }
+  };
+
   return (
-    <div className="card">
+    <div className="card" onClick={irParaDetalhe}>
       <div className="image-container">
-        <img className="image" src={dados.img} alt={dados.nome} />
+        <img className="image" src={dados.url || dados.img} alt={dados.nome} />
         <div className="tag-monumento">
           <Landmark size={12} />
           {dados.categoria}
@@ -31,7 +45,6 @@ export default function SpotCard({ item }) {
       </div>
 
       <div className="content">
-        {/* Adicionado apenas o h2 aqui para renderizar o nome do ponto */}
         <h2>{dados.nome || dados.titulo}</h2>
 
         <div className="details">
@@ -41,20 +54,24 @@ export default function SpotCard({ item }) {
           </span>
         </div>
 
-        <p>{dados.descricao}</p>
+        <p className="card-descricao-curta">{dados.descricao}</p>
 
         <div className="card-footer">
           <div className="rating">
             <Star size={14} fill="#ffb703" stroke="#ffb703" />
-            <span>{dados.nota || '4.8'}</span>
+            <span>{dados.notaMedia?.toFixed(1) || dados.nota || '0.0'}</span>
           </div>
 
           <div className="buttons-group">
             <button className="primary-btn-details" onClick={irParaDetalhe}>
               Ver detalhes
             </button>
-            <button className="icon-btn-favorite" title="Adicionar aos Favoritos">
-              <Heart size={18} />
+            <button 
+              className={`icon-btn-favorite ${favoritado ? 'active' : ''}`} 
+              onClick={handleFavorito}
+              title={favoritado ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
+            >
+              <Heart size={18} fill={favoritado ? "currentColor" : "none"} />
             </button>
           </div>
         </div>
