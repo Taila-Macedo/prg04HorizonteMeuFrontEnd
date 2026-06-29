@@ -83,16 +83,21 @@ export function useComentarios(pontoId) {
 
     try {
       let fotoUrl = null;
+
       if (novoComentario.fotoFile) {
-        // IMPORTANTE: Não enviamos o idPontoTuristico aqui para evitar que a foto
-        // seja vinculada à galeria oficial do ponto pelo backend.
-        // O backend ainda salvará a foto no Cloudinary e nos devolverá a URL.
-        const uploadRes = await uploadFoto({
-          arquivo: novoComentario.fotoFile,
-          idUsuario: usuario.id,
-          legenda: `Foto da avaliação de ${usuario.nome}`
+        // Usa endpoint de upload avulso — só sobe para Cloudinary, não salva no banco
+        const formData = new FormData();
+        formData.append('arquivo', novoComentario.fotoFile);
+
+        const uploadRes = await fetch(`${BASE}/fotos/upload`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData,
         });
-        if (uploadRes) fotoUrl = uploadRes.url;
+
+        if (!uploadRes.ok) throw new Error('Erro ao enviar a foto.');
+        const uploadData = await uploadRes.json();
+        fotoUrl = uploadData.url;
       }
 
       const payload = {
@@ -100,31 +105,28 @@ export function useComentarios(pontoId) {
         nota: novoComentario.nota,
         fotoUrl: fotoUrl,
         idUsuario: usuario.id,
-        idPontoTuristico: Number(pontoId)
+        idPontoTuristico: Number(pontoId),
       };
 
       const res = await fetch(`${BASE}/comentarios`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error('Erro ao publicar avaliação.');
 
       const salvo = await res.json();
-      
-      const novoFormatado = {
-        ...salvo,
-        autorNome: usuario.nome,
-        meu: true
-      };
-      
-      setComentarios(prev => [novoFormatado, ...prev]);
+
+      setComentarios((prev) => [
+        { ...salvo, autorNome: usuario.nome, meu: true },
+        ...prev,
+      ]);
       setNovoComentario({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });
-      
+
     } catch (err) {
       alert(err.message);
     }
