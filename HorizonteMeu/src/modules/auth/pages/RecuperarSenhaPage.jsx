@@ -19,12 +19,28 @@ export default function RecuperarSenhaPage() {
     isNovaSenhaValid,
     isConfirmarSenhaValid,
     enviando,
-    sucesso,
+    erroApi,
     handleEnviarCodigo,
     handleValidarCodigo,
     handleRedefinirSenha,
     handleReenviarCodigo,
   } = useRecuperarSenha();
+
+  // Bloco de erro da API — reutilizado em todas as etapas
+  const ErroApi = () =>
+    erroApi ? (
+      <p style={{
+        color: '#ff6b6b',
+        fontSize: '0.85rem',
+        textAlign: 'center',
+        marginBottom: '16px',
+        background: 'rgba(255,107,107,0.1)',
+        padding: '10px 14px',
+        borderRadius: '8px',
+      }}>
+        ⚠️ {erroApi}
+      </p>
+    ) : null;
 
   /* ── Etapa 1: informe o e-mail ── */
   if (etapa === 1) {
@@ -40,6 +56,8 @@ export default function RecuperarSenhaPage() {
           <p style={{ color: 'rgba(247,248,252,0.6)', fontSize: '0.88rem', marginBottom: '28px', textAlign: 'center', lineHeight: 1.6 }}>
             Informe o e-mail cadastrado e enviaremos um código de verificação.
           </p>
+
+          <ErroApi />
 
           <form noValidate onSubmit={handleEnviarCodigo}>
             <div className="form-group">
@@ -87,8 +105,10 @@ export default function RecuperarSenhaPage() {
 
           <p style={{ color: 'rgba(247,248,252,0.6)', fontSize: '0.88rem', marginBottom: '28px', textAlign: 'center', lineHeight: 1.6 }}>
             Enviamos um código para <strong style={{ color: 'var(--azul-claro)' }}>{email}</strong>.
-            Verifique sua caixa de entrada.
+            Verifique sua caixa de entrada (e a pasta de spam).
           </p>
+
+          <ErroApi />
 
           <form noValidate onSubmit={handleValidarCodigo}>
             <div className="form-group">
@@ -122,7 +142,7 @@ export default function RecuperarSenhaPage() {
               onClick={(e) => { e.preventDefault(); handleReenviarCodigo(); }}
               style={{ display: 'block', marginBottom: '12px' }}
             >
-              Não recebeu? Reenviar código
+              {enviando ? 'Reenviando...' : 'Não recebeu? Reenviar código'}
             </a>
             <p className="cadastro-link">
               <Link to="/login">Voltar ao login</Link>
@@ -147,6 +167,8 @@ export default function RecuperarSenhaPage() {
           <p style={{ color: 'rgba(247,248,252,0.6)', fontSize: '0.88rem', marginBottom: '28px', textAlign: 'center', lineHeight: 1.6 }}>
             Escolha uma nova senha segura para sua conta.
           </p>
+
+          <ErroApi />
 
           <form noValidate onSubmit={handleRedefinirSenha}>
             <div className="form-group">
