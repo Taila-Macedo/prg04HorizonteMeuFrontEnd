@@ -1,41 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PONTOS_MOCK } from '../../../shared/mocks/mockData';
+import { useAuth } from '../../../shared/contexts/AuthContext';
 
-// Achata todos os pontos de todos os países num array único
-const TODOS_OS_PONTOS = Object.values(PONTOS_MOCK).flat();
-
-// Mock do roteiro — substitua por GET /roteiros/{id}
-const ROTEIROS_MOCK = {
-  1: {
-    id: 1,
-    titulo: 'Férias de verão na Europa',
-    descricao: 'Roteiro passando por Paris, Amsterdã e Berlim. Uma experiência inesquecível pelos melhores pontos turísticos do continente.',
-    dataViagem: '2025-07-15',
-    publico: true,
-    idUsuario: 1,
-    pontos: [
-      { id: 1, ordem: 1, visitado: false, idPontoTuristico: 1, nomePontoTuristico: 'Torre Eiffel' },
-      { id: 2, ordem: 2, visitado: true,  idPontoTuristico: 2, nomePontoTuristico: 'Museu do Louvre' },
-      { id: 3, ordem: 3, visitado: false, idPontoTuristico: 3, nomePontoTuristico: 'Praia de Nice' },
-    ],
-  },
-  2: {
-    id: 2,
-    titulo: 'Explorando o Nordeste',
-    descricao: 'Melhores praias e pontos históricos de Salvador e Recife.',
-    dataViagem: '2025-12-20',
-    publico: false,
-    idUsuario: 1,
-    pontos: [
-      { id: 4, ordem: 1, visitado: false, idPontoTuristico: 4, nomePontoTuristico: 'Mont Blanc' },
-    ],
-  },
-};
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useEditarRoteiro() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   // ── Campos do formulário ─────────────────────────────────────────────────
   const [titulo, setTitulo]         = useState('');
@@ -47,55 +19,69 @@ export function useEditarRoteiro() {
   // Cada item: { idPontoTuristico, nomePontoTuristico, ordem }
   const [pontos, setPontos] = useState([]);
 
-  // ── Seletor de novo ponto ────────────────────────────────────────────────
-  // pontosDisponiveis: todos os pontos do mock que ainda não estão na lista
-  const [buscaPonto, setBuscaPonto]           = useState('');
-  const [seletorAberto, setSeletorAberto]     = useState(false);
+  // ── Pontos turísticos disponíveis para adicionar (vêm da API) ───────────
+  const [todosOsPontos, setTodosOsPontos] = useState([]);
+  const [buscaPonto, setBuscaPonto]       = useState('');
+  const [seletorAberto, setSeletorAberto] = useState(false);
 
   // ── Controle de UI ───────────────────────────────────────────────────────
-  const [carregando, setCarregando]         = useState(true);
-  const [naoEncontrado, setNaoEncontrado]   = useState(false);
-  const [tituloTouched, setTituloTouched]   = useState(false);
-  const [salvando, setSalvando]             = useState(false);
+  const [carregando, setCarregando]       = useState(true);
+  const [naoEncontrado, setNaoEncontrado] = useState(false);
+  const [tituloTouched, setTituloTouched] = useState(false);
+  const [salvando, setSalvando]           = useState(false);
 
   const isTituloValid = titulo.trim().length >= 3;
 
-  // ── Carrega dados existentes ─────────────────────────────────────────────
-  useEffect(() => {
-    const carregar = async () => {
-      setCarregando(true);
-      try {
-        // TODO: GET /roteiros/{id}
-        await new Promise((res) => setTimeout(res, 600));
-        const dado = ROTEIROS_MOCK[Number(id)] ?? null;
+  // ── Carrega o roteiro (GET /roteiros/{id}) e a lista de pontos turísticos
+  //    (GET /pontos) em paralelo ────────────────────────────────────────────
+  const carregar = useCallback(async () => {
+    setCarregando(true);
+    setNaoEncontrado(false);
+    try {
+      const [resRoteiro, resPontos] = await Promise.all([
+        fetch(`${BASE}/roteiros/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        fetch(`${BASE}/pontos?page=0&size=100`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+      ]);
 
-        if (!dado) {
-          setNaoEncontrado(true);
-        } else {
-          setTitulo(dado.titulo);
-          setDescricao(dado.descricao ?? '');
-          setDataViagem(dado.dataViagem ?? '');
-          setPublico(dado.publico ?? false);
-          // Converte para o formato interno: { idPontoTuristico, nomePontoTuristico, ordem }
-          setPontos(
-            [...(dado.pontos ?? [])].sort((a, b) => a.ordem - b.ordem)
-          );
-        }
-      } catch (err) {
-        console.error('Erro ao carregar roteiro:', err);
+      if (!resRoteiro.ok) {
         setNaoEncontrado(true);
-      } finally {
-        setCarregando(false);
+        return;
       }
-    };
+
+      const dado = await resRoteiro.json();
+      setTitulo(dado.titulo);
+      setDescricao(dado.descricao ?? '');
+      setDataViagem(dado.dataViagem ?? '');
+      setPublico(dado.publico ?? false);
+      setPontos(
+        [...(dado.pontos ?? [])].sort((a, b) => a.ordem - b.ordem)
+      );
+
+      if (resPontos.ok) {
+        const dadosPontos = await resPontos.json();
+        setTodosOsPontos(Array.isArray(dadosPontos.content) ? dadosPontos.content : []);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar roteiro:', err);
+      setNaoEncontrado(true);
+    } finally {
+      setCarregando(false);
+    }
+  }, [id, token]);
+
+  useEffect(() => {
     carregar();
-  }, [id]);
+  }, [carregar]);
 
   // ── Pontos disponíveis para adicionar ────────────────────────────────────
   // Remove os que já estão na lista e aplica o filtro de busca
   const idsJaNaLista = new Set(pontos.map((p) => p.idPontoTuristico));
 
-  const pontosDisponiveis = TODOS_OS_PONTOS.filter((p) => {
+  const pontosDisponiveis = todosOsPontos.filter((p) => {
     const naoEstaNaLista = !idsJaNaLista.has(p.id);
     const baterBusca = p.nome.toLowerCase().includes(buscaPonto.toLowerCase()) ||
                        p.cidade.toLowerCase().includes(buscaPonto.toLowerCase());
@@ -109,7 +95,6 @@ export function useEditarRoteiro() {
       {
         idPontoTuristico: ponto.id,
         nomePontoTuristico: ponto.nome,
-        // ordem = próximo número da sequência
         ordem: prev.length + 1,
       },
     ]);
@@ -121,7 +106,6 @@ export function useEditarRoteiro() {
   const removerPonto = (idPontoTuristico) => {
     setPontos((prev) => {
       const filtrado = prev.filter((p) => p.idPontoTuristico !== idPontoTuristico);
-      // Recalcula a ordem para não ficar com buracos (1, 2, 3...)
       return filtrado.map((p, i) => ({ ...p, ordem: i + 1 }));
     });
   };
@@ -132,7 +116,6 @@ export function useEditarRoteiro() {
     setPontos((prev) => {
       const nova = [...prev];
       [nova[index - 1], nova[index]] = [nova[index], nova[index - 1]];
-      // Recalcula ordem após troca
       return nova.map((p, i) => ({ ...p, ordem: i + 1 }));
     });
   };
@@ -155,9 +138,6 @@ export function useEditarRoteiro() {
 
     setSalvando(true);
     try {
-      // TODO: PUT /roteiros/{id}
-      // Body alinhado com RoteiroPutRequestDto:
-      // { titulo, descricao, dataViagem, publico, pontos: [{ idPontoTuristico, ordem }] }
       const body = {
         titulo,
         descricao,
@@ -168,11 +148,25 @@ export function useEditarRoteiro() {
           ordem: p.ordem,
         })),
       };
-      console.log('PUT /roteiros/' + id, body);
-      await new Promise((res) => setTimeout(res, 700));
+
+      const res = await fetch(`${BASE}/roteiros/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const erroData = await res.json().catch(() => ({}));
+        throw new Error(erroData.message || 'Erro ao salvar roteiro.');
+      }
+
       navigate(`/roteiros/${id}`);
     } catch (err) {
       console.error('Erro ao salvar:', err);
+      alert(err.message);
     } finally {
       setSalvando(false);
     }
@@ -181,12 +175,10 @@ export function useEditarRoteiro() {
   const handleCancelar = () => navigate(`/roteiros/${id}`);
 
   return {
-    // Campos
     titulo, setTitulo,
     descricao, setDescricao,
     dataViagem, setDataViagem,
     publico, setPublico,
-    // Pontos
     pontos,
     pontosDisponiveis,
     buscaPonto, setBuscaPonto,
@@ -195,13 +187,11 @@ export function useEditarRoteiro() {
     removerPonto,
     moverParaCima,
     moverParaBaixo,
-    // Validação e UI
     tituloTouched, setTituloTouched,
     isTituloValid,
     carregando,
     naoEncontrado,
     salvando,
-    // Ações
     handleSubmit,
     handleCancelar,
   };

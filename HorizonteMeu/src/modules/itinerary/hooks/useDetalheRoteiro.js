@@ -1,71 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../shared/contexts/AuthContext';
 
-// Mock local — substitua por chamadas reais à API quando disponível
-const ROTEIROS_MOCK = {
-  1: {
-    id: 1,
-    titulo: 'Férias de verão na Europa',
-    descricao: 'Roteiro passando por Paris, Amsterdã e Berlim. Uma experiência inesquecível pelos melhores pontos turísticos do continente.',
-    dataViagem: '2025-07-15',
-    dataCriacao: '2025-03-01',
-    publico: true,
-    idUsuario: 1,
-    pontos: [
-      { id: 1, ordem: 1, visitado: false, idPontoTuristico: 1, nomePontoTuristico: 'Torre Eiffel' },
-      { id: 2, ordem: 2, visitado: true,  idPontoTuristico: 2, nomePontoTuristico: 'Museu do Louvre' },
-      { id: 3, ordem: 3, visitado: false, idPontoTuristico: 3, nomePontoTuristico: 'Praia de Nice' },
-    ],
-  },
-  2: {
-    id: 2,
-    titulo: 'Explorando o Nordeste',
-    descricao: 'Melhores praias e pontos históricos de Salvador e Recife.',
-    dataViagem: '2025-12-20',
-    dataCriacao: '2025-05-10',
-    publico: false,
-    idUsuario: 1,
-    pontos: [
-      { id: 4, ordem: 1, visitado: false, idPontoTuristico: 10, nomePontoTuristico: 'Pelourinho' },
-      { id: 5, ordem: 2, visitado: false, idPontoTuristico: 11, nomePontoTuristico: 'Praia do Porto de Galinhas' },
-    ],
-  },
-};
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useDetalheRoteiro() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const [roteiro, setRoteiro]   = useState(null);
   const [loading, setLoading]   = useState(true);
   const [naoEncontrado, setNaoEncontrado] = useState(false);
 
-  // Estado de compartilhamento: feedback visual ao clicar no botão
   const [compartilhando, setCompartilhando] = useState(false);
   const [linkCopiado, setLinkCopiado]       = useState(false);
 
-  // Carrega o roteiro pelo id da URL
-  useEffect(() => {
-    const carregar = async () => {
-      setLoading(true);
-      try {
-        // TODO: GET /roteiros/{id}
-        await new Promise((res) => setTimeout(res, 600)); // simula latência
-        const dado = ROTEIROS_MOCK[Number(id)] ?? null;
-        if (!dado) {
-          setNaoEncontrado(true);
-        } else {
-          setRoteiro(dado);
-        }
-      } catch (err) {
-        console.error('Erro ao carregar roteiro:', err);
+  // Carrega o roteiro pelo id da URL — GET /roteiros/{id}
+  const carregar = useCallback(async () => {
+    setLoading(true);
+    setNaoEncontrado(false);
+    try {
+      const res = await fetch(`${BASE}/roteiros/${id}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+
+      if (!res.ok) {
         setNaoEncontrado(true);
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
+
+      const dado = await res.json();
+      setRoteiro(dado);
+    } catch (err) {
+      console.error('Erro ao carregar roteiro:', err);
+      setNaoEncontrado(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [id, token]);
+
+  useEffect(() => {
     carregar();
-  }, [id]);
+  }, [carregar]);
 
   // Formata "2025-07-15" → "15/07/2025"
   const formatarData = (dataString) => {
@@ -88,8 +65,14 @@ export function useDetalheRoteiro() {
     }));
 
     try {
-      // TODO: PATCH /roteiros/pontos/{idRoteiroPonto}?visitado={novoValor}
-      console.log(`Marcando ponto ${idRoteiroPonto} como visitado=${novoValor}`);
+      const res = await fetch(
+        `${BASE}/roteiros/pontos/${idRoteiroPonto}?visitado=${novoValor}`,
+        {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` },
+        }
+      );
+      if (!res.ok) throw new Error('Erro ao atualizar visitado.');
     } catch (err) {
       // Reverte se a API falhar
       console.error('Erro ao atualizar visitado:', err);
@@ -102,34 +85,36 @@ export function useDetalheRoteiro() {
     }
   };
 
-  // Torna o roteiro público e copia o link
-  // PATCH /roteiros/{id}/compartilhar
+  // Torna o roteiro público e copia o link — PATCH /roteiros/{id}/compartilhar
   const handleCompartilhar = async () => {
     if (compartilhando) return;
     setCompartilhando(true);
     try {
-      // TODO: PATCH /roteiros/{id}/compartilhar
-      await new Promise((res) => setTimeout(res, 500));
+      const res = await fetch(`${BASE}/roteiros/${id}/compartilhar`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
 
-      // Atualiza o estado local para refletir publico=true
-      setRoteiro((prev) => ({ ...prev, publico: true }));
+      if (!res.ok) throw new Error('Erro ao compartilhar roteiro.');
 
-      // Copia o link para o clipboard
+      const atualizado = await res.json();
+      setRoteiro(atualizado);
+
       const link = `${window.location.origin}/roteiros/${id}`;
       await navigator.clipboard.writeText(link);
       setLinkCopiado(true);
       setTimeout(() => setLinkCopiado(false), 3000);
     } catch (err) {
       console.error('Erro ao compartilhar:', err);
+      alert(err.message);
     } finally {
       setCompartilhando(false);
     }
   };
 
-  // Calcula quantos pontos já foram visitados
-  const totalPontos    = roteiro?.pontos?.length ?? 0;
+  const totalPontos     = roteiro?.pontos?.length ?? 0;
   const pontosVisitados = roteiro?.pontos?.filter((p) => p.visitado).length ?? 0;
-  const progresso      = totalPontos > 0 ? Math.round((pontosVisitados / totalPontos) * 100) : 0;
+  const progresso       = totalPontos > 0 ? Math.round((pontosVisitados / totalPontos) * 100) : 0;
 
   return {
     roteiro,

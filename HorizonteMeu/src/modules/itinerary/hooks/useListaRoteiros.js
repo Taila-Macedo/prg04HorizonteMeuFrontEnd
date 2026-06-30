@@ -1,46 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../../shared/contexts/AuthContext';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useListaRoteiros() {
+  const { usuario, token } = useAuth();
   const [roteiros, setRoteiros] = useState([]);
   const [loading, setLoading] = useState(true);
-  // CORRIGIDO: substitui window.confirm por estado de confirmação inline
+  const [erro, setErro] = useState('');
+  // Estado de confirmação inline antes de deletar
   const [confirmandoId, setConfirmandoId] = useState(null);
 
+  const carregarRoteiros = useCallback(async () => {
+    if (!usuario || !token) return;
+
+    try {
+      setLoading(true);
+      setErro('');
+      const res = await fetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Erro ao carregar roteiros.');
+
+      const data = await res.json();
+      // RoteiroGetResponseDto já vem com "pontos" — derivamos a quantidade aqui
+      const lista = (Array.isArray(data) ? data : []).map((r) => ({
+        ...r,
+        quantidadePontos: r.pontos?.length ?? 0,
+      }));
+      setRoteiros(lista);
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [usuario, token]);
+
   useEffect(() => {
-    const carregarRoteiros = async () => {
-      try {
-        // TODO: GET /roteiros/usuario/{idUsuario}
-        const dadosMock = [
-          {
-            id: 1,
-            titulo: "Férias de verão na Europa",
-            descricao: "Roteiro passando por Paris, Amsterdã e Berlim.",
-            dataViagem: "2025-07-15",
-            publico: true,
-            quantidadePontos: 8
-          },
-          {
-            id: 2,
-            titulo: "Explorando o Nordeste",
-            descricao: "Melhores praias e pontos históricos de Salvador e Recife.",
-            dataViagem: "2025-12-20",
-            publico: false,
-            quantidadePontos: 5
-          }
-        ];
-
-        setTimeout(() => {
-          setRoteiros(dadosMock);
-          setLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error("Erro ao carregar roteiros:", error);
-        setLoading(false);
-      }
-    };
-
     carregarRoteiros();
-  }, []);
+  }, [carregarRoteiros]);
 
   const formatarData = (dataString) => {
     if (!dataString) return "";
@@ -54,12 +53,23 @@ export function useListaRoteiros() {
     setConfirmandoId(id);
   };
 
-  // Confirma e deleta
-  const confirmarDelecao = (id, e) => {
+  // Confirma e deleta — DELETE /roteiros/{id}
+  const confirmarDelecao = async (id, e) => {
     e.stopPropagation();
-    // TODO: DELETE /roteiros/{id}
-    setRoteiros(prev => prev.filter(r => r.id !== id));
-    setConfirmandoId(null);
+    try {
+      const res = await fetch(`${BASE}/roteiros/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Erro ao excluir roteiro.');
+
+      setRoteiros(prev => prev.filter(r => r.id !== id));
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setConfirmandoId(null);
+    }
   };
 
   // Cancela sem deletar
@@ -71,6 +81,7 @@ export function useListaRoteiros() {
   return {
     roteiros,
     loading,
+    erro,
     formatarData,
     confirmandoId,
     pedirConfirmacao,
