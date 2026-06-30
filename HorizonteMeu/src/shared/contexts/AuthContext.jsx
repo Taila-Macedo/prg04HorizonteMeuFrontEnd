@@ -1,12 +1,9 @@
-// src/shared/contexts/AuthContext.jsx
-//
+
 // Contexto global de autenticação.
 // Guarda o token JWT e os dados do usuário logado em memória + localStorage.
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
-
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function AuthProvider({ children }) {
@@ -18,13 +15,20 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const tokenSalvo = localStorage.getItem('hm_token');
     const usuarioSalvo = localStorage.getItem('hm_usuario');
-
     if (tokenSalvo && usuarioSalvo) {
       setToken(tokenSalvo);
       setUsuario(JSON.parse(usuarioSalvo));
     }
     setCarregando(false);
   }, []);
+
+  // Atualiza os dados do usuário em memória e no localStorage
+  const atualizarUsuario = (dadosAtualizados) => {
+    setUsuario(prev => ({ ...prev, ...dadosAtualizados }));
+    
+    const stored = JSON.parse(localStorage.getItem('hm_usuario') || '{}');
+    localStorage.setItem('hm_usuario', JSON.stringify({ ...stored, ...dadosAtualizados }));
+  };
 
   // Login — chama POST /auth/login e salva token + usuário
   const login = async (email, senha) => {
@@ -33,24 +37,22 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha }),
     });
-
+    
     if (!res.ok) {
       throw new Error('E-mail ou senha inválidos.');
     }
-
+    
     // Resposta: { token, id, nome, email, perfil }
     const dados = await res.json();
-
     const usuarioLogado = {
       id: dados.id,
       nome: dados.nome,
       email: dados.email,
       perfil: dados.perfil,
     };
-
+    
     localStorage.setItem('hm_token', dados.token);
     localStorage.setItem('hm_usuario', JSON.stringify(usuarioLogado));
-
     setToken(dados.token);
     setUsuario(usuarioLogado);
   };
@@ -67,7 +69,7 @@ export function AuthProvider({ children }) {
   const eAdmin = usuario?.perfil === 'ADMINISTRADOR';
 
   return (
-    <AuthContext.Provider value={{ usuario, token, estaLogado, eAdmin, carregando, login, logout }}>
+    <AuthContext.Provider value={{ usuario, token, estaLogado, eAdmin, carregando, login, logout, atualizarUsuario }}>
       {children}
     </AuthContext.Provider>
   );
