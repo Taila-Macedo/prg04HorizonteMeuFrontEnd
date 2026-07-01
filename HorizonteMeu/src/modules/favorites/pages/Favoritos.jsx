@@ -16,6 +16,7 @@ export default function Favoritos() {
   const [confirmandoId, setConfirmandoId] = useState(null);
 
   // Como o endpoint de favoritos só traz os IDs, precisamos buscar os detalhes de cada ponto
+  // e também suas fotos reais (o endpoint de ponto não retorna a foto certa)
   useEffect(() => {
     const carregarDetalhesDosPontos = async () => {
       if (favoritos.length === 0) {
@@ -27,11 +28,23 @@ export default function Favoritos() {
         setCarregandoDetalhes(true);
         const promessas = favoritos.map(async (fav) => {
           const res = await fetch(`${BASE}/pontos/${fav.idPontoTuristico}`);
-          if (res.ok) {
-            const ponto = await res.json();
-            return { ...fav, pontoTuristico: ponto };
+          if (!res.ok) return null;
+          const ponto = await res.json();
+
+          let fotoUrl = null;
+          try {
+            const resFotos = await fetch(`${BASE}/fotos/ponto/${fav.idPontoTuristico}`);
+            if (resFotos.ok) {
+              const fotosList = await resFotos.json();
+              if (Array.isArray(fotosList) && fotosList.length > 0) {
+                fotoUrl = fotosList[0].url;
+              }
+            }
+          } catch {
+            // sem foto, mantém null
           }
-          return null;
+
+          return { ...fav, pontoTuristico: { ...ponto, fotoUrl } };
         });
 
         const resultados = await Promise.all(promessas);
@@ -127,14 +140,17 @@ export default function Favoritos() {
                 <div key={fav.id} className="favorito-card">
 
                   <div className="favorito-img-wrapper" onClick={() => navigate(`/pontos/${p.id}`)}>
-                    <img
-                      src={p.url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600'}
-                      alt={p.nome}
-                      className="favorito-img"
-                    />
-                    <span className="favorito-categoria">
-                      {CATEGORIA_LABEL[p.categoria] || p.categoria}
-                    </span>
+                    {p.fotoUrl ? (
+                      <img
+                        src={p.fotoUrl}
+                        alt={p.nome}
+                        className="favorito-img"
+                      />
+                    ) : (
+                      <div className="favorito-img favorito-img-vazia">
+                        <MapPin size={28} />
+                      </div>
+                    )}
                   </div>
 
                   <div className="favorito-content">

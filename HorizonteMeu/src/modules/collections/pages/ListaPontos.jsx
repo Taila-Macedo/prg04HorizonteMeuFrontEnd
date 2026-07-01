@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Search, SlidersHorizontal, Plus, AlertCircle } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { useListaPontos } from '../hooks/useListaPontos';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import '../styles/ListaPontos.css';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const CATEGORIAS = [
   { key: 'TODOS',     label: 'Todos'      },
@@ -44,6 +46,36 @@ export default function ListaPontos() {
     categoriaAtiva,
     setCategoriaAtiva,
   } = useListaPontos();
+
+  // Mapa idPonto -> url da foto (o objeto do ponto não traz a foto real)
+  const [fotosPorPonto, setFotosPorPonto] = useState({});
+
+  useEffect(() => {
+    const carregarFotos = async () => {
+      if (pontos.length === 0) return;
+
+      const entradas = await Promise.all(
+        pontos.map(async (ponto) => {
+          try {
+            const res = await fetch(`${BASE}/fotos/ponto/${ponto.id}`);
+            if (res.ok) {
+              const fotosList = await res.json();
+              if (Array.isArray(fotosList) && fotosList.length > 0) {
+                return [ponto.id, fotosList[0].url];
+              }
+            }
+          } catch {
+            // sem foto
+          }
+          return [ponto.id, null];
+        })
+      );
+
+      setFotosPorPonto(Object.fromEntries(entradas));
+    };
+
+    carregarFotos();
+  }, [pontos]);
 
   return (
     <div className="lp-container">
@@ -121,39 +153,39 @@ export default function ListaPontos() {
           <>
             <p className="lp-contagem">{pontos.length} ponto{pontos.length !== 1 ? 's' : ''} encontrado{pontos.length !== 1 ? 's' : ''}</p>
             <div className="lp-grid">
-              {pontos.map((ponto) => (
-                <div
-                  key={ponto.id}
-                  className="lp-card"
-                  onClick={() => navigate(`/pontos/${ponto.id}`)}
-                >
-                  <div className="lp-card-img-wrapper">
-                    {ponto.img ? (
-                      <img src={ponto.img} alt={ponto.nome} className="lp-card-img" />
-                    ) : (
-                      <div className="lp-card-img-vazio">
-                        <MapPin size={28} />
-                      </div>
-                    )}
-                    <span className="lp-card-categoria">
-                      {CATEGORIA_LABEL[ponto.categoria] || ponto.categoria}
-                    </span>
-                  </div>
+              {pontos.map((ponto) => {
+                const fotoUrl = fotosPorPonto[ponto.id];
+                return (
+                  <div
+                    key={ponto.id}
+                    className="lp-card"
+                    onClick={() => navigate(`/pontos/${ponto.id}`)}
+                  >
+                    <div className="lp-card-img-wrapper">
+                      {fotoUrl ? (
+                        <img src={fotoUrl} alt={ponto.nome} className="lp-card-img" />
+                      ) : (
+                        <div className="lp-card-img-vazio">
+                          <MapPin size={28} />
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="lp-card-body">
-                    <h3 className="lp-card-nome">{ponto.nome}</h3>
-                    <div className="lp-card-local">
-                      <MapPin size={12} />
-                      <span>{ponto.cidade}, {ponto.pais}</span>
-                    </div>
-                    <p className="lp-card-descricao">{ponto.descricao}</p>
-                    <div className="lp-card-footer">
-                      <Estrelas nota={ponto.notaMedia} />
-                      <span className="lp-card-nota">{ponto.notaMedia?.toFixed(1) || '0.0'}</span>
+                    <div className="lp-card-body">
+                      <h3 className="lp-card-nome">{ponto.nome}</h3>
+                      <div className="lp-card-local">
+                        <MapPin size={12} />
+                        <span>{ponto.cidade}, {ponto.pais}</span>
+                      </div>
+                      <p className="lp-card-descricao">{ponto.descricao}</p>
+                      <div className="lp-card-footer">
+                        <Estrelas nota={ponto.notaMedia} />
+                        <span className="lp-card-nota">{ponto.notaMedia?.toFixed(1) || '0.0'}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}

@@ -46,7 +46,7 @@ export default function DetalhePonto() {
   const navigate = useNavigate();
   const navRef = useRef(null);
   const btnFavoritarRef = useRef(null);
-  const { usuario } = useAuth();
+  const { usuario, token } = useAuth();
   const { uploadFoto } = useUploadFoto();
   const { isFavoritado, favoritar, removerFavorito, getFavoritoId } = useFavoritos();
 
@@ -66,6 +66,11 @@ export default function DetalhePonto() {
   const [fotoEnviada, setFotoEnviada] = useState(false);
 
   const [modalRoteiro, setModalRoteiro] = useState(false);
+  const [roteiros, setRoteiros] = useState([]);
+  const [carregandoRoteiros, setCarregandoRoteiros] = useState(false);
+  const [enviandoRoteiro, setEnviandoRoteiro] = useState(false);
+  const [erroRoteiro, setErroRoteiro] = useState('');
+  const [roteiroAdicionado, setRoteiroAdicionado] = useState(null);
 
   const isAdmin = usuario?.perfil === 'ADMINISTRADOR';
   const favoritado = isFavoritado(id);
@@ -142,6 +147,72 @@ export default function DetalhePonto() {
     }
   };
 
+  const abrirModalRoteiro = async () => {
+    setModalRoteiro(true);
+    setRoteiroAdicionado(null);
+    setErroRoteiro('');
+    setCarregandoRoteiros(true);
+    try {
+      const res = await fetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Erro ao carregar seus roteiros.');
+      const data = await res.json();
+      setRoteiros(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setErroRoteiro(err.message);
+    } finally {
+      setCarregandoRoteiros(false);
+    }
+  };
+
+  const handleAdicionarNoRoteiro = async (roteiroId) => {
+    setEnviandoRoteiro(true);
+    setErroRoteiro('');
+    try {
+      const resRoteiro = await fetch(`${BASE}/roteiros/${roteiroId}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!resRoteiro.ok) throw new Error('Erro ao carregar o roteiro.');
+      const roteiroAtual = await resRoteiro.json();
+      const pontosAtuais = roteiroAtual.pontos ?? [];
+
+      if (pontosAtuais.some((p) => p.idPontoTuristico === Number(id))) {
+        setErroRoteiro('Esse ponto já está nesse roteiro.');
+        return;
+      }
+
+      const novosPontos = [
+        ...pontosAtuais.map((p) => ({ idPontoTuristico: p.idPontoTuristico, ordem: p.ordem })),
+        { idPontoTuristico: Number(id), ordem: pontosAtuais.length + 1 },
+      ];
+
+      const res = await fetch(`${BASE}/roteiros/${roteiroId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          titulo: roteiroAtual.titulo,
+          descricao: roteiroAtual.descricao,
+          dataViagem: roteiroAtual.dataViagem,
+          publico: roteiroAtual.publico,
+          pontos: novosPontos,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Erro ao adicionar ao roteiro.');
+
+      setRoteiroAdicionado(roteiroId);
+      setTimeout(() => setModalRoteiro(false), 1200);
+    } catch (err) {
+      setErroRoteiro(err.message);
+    } finally {
+      setEnviandoRoteiro(false);
+    }
+  };
+
   if (carregando) return <div className="detalhe-loading"><div className="loading-spinner" /><p>Carregando...</p></div>;
   if (!ponto) return <div className="detalhe-loading"><p>{erroCarregamento || 'Ponto não encontrado.'}</p><button onClick={() => navigate('/pontos')}>Voltar</button></div>;
 
@@ -167,7 +238,6 @@ export default function DetalhePonto() {
         ) : (
           <div className="detalhe-hero-vazio"><Camera size={40} /><span>Sem fotos</span></div>
         )}
-        <span className="detalhe-categoria-badge">{CATEGORIA_LABEL[ponto.categoria] || ponto.categoria}</span>
       </div>
 
       <div className="detalhe-main">
@@ -191,7 +261,7 @@ export default function DetalhePonto() {
             <Map size={17} />Ver no mapa
           </button>
           <button className="btn-acao" onClick={() => setModalFoto(true)}><Camera size={17} />Enviar foto</button>
-          <button className="btn-acao" onClick={() => setModalRoteiro(true)}><Route size={17} />Add. ao roteiro</button>
+          <button className="btn-acao" onClick={abrirModalRoteiro}><Route size={17} />Add. ao roteiro</button>
           {isAdmin && <button className="btn-acao ativo-amarelo" onClick={() => navigate(`/pontos/${id}/editar`)}><Edit2 size={17} />Editar</button>}
         </div>
 
@@ -201,7 +271,6 @@ export default function DetalhePonto() {
         <div className="detalhe-comentarios"><ComentariosSecao pontoId={id} /></div>
       </div>
 
-      {/* Modais omitidos para brevidade, mas mantidos no arquivo final */}
       {modalFoto && (
         <div className="modal-overlay" onClick={() => setModalFoto(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -221,12 +290,38 @@ export default function DetalhePonto() {
           </div>
         </div>
       )}
+
       {modalRoteiro && (
         <div className="modal-overlay" onClick={() => setModalRoteiro(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header"><h3>Adicionar ao roteiro</h3><button className="modal-fechar" onClick={() => setModalRoteiro(false)}><X size={18} /></button></div>
-            <p className="modal-descricao">Em breve!</p>
-            <button className="btn-enviar-modal" onClick={() => setModalRoteiro(false)}>Fechar</button>
+
+            {roteiroAdicionado ? (
+              <div className="modal-sucesso"><div className="modal-sucesso-icon"><Check size={28} /></div><p>Adicionado ao roteiro!</p></div>
+            ) : carregandoRoteiros ? (
+              <p className="modal-descricao">Carregando seus roteiros...</p>
+            ) : roteiros.length === 0 ? (
+              <>
+                <p className="modal-descricao">Você ainda não tem nenhum roteiro.</p>
+                <button className="btn-enviar-modal" onClick={() => navigate('/roteiros/novo')}>Criar novo roteiro</button>
+              </>
+            ) : (
+              <>
+                {erroRoteiro && <p style={{ color: 'red', fontSize: 13, marginBottom: 8 }}>{erroRoteiro}</p>}
+                {roteiros.map((r) => (
+                  <button
+                    key={r.id}
+                    className="btn-acao"
+                    style={{ width: '100%', marginBottom: 8 }}
+                    disabled={enviandoRoteiro}
+                    onClick={() => handleAdicionarNoRoteiro(r.id)}
+                  >
+                    {r.titulo}
+                  </button>
+                ))}
+                <button className="btn-enviar-modal" onClick={() => navigate('/roteiros/novo')}>+ Criar novo roteiro</button>
+              </>
+            )}
           </div>
         </div>
       )}
