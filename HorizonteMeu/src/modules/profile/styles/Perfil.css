@@ -1,12 +1,3 @@
-/* ══════════════════════════════════════════════
-   PERFIL PAGE — estilos exclusivos da tela de perfil
-   Variáveis herdadas do Dashboard.css:
-   --azul-profundo, --azul-escuro, --azul-medio,
-   --azul-claro, --dourado, --dourado-claro, --branco
-   ══════════════════════════════════════════════ */
-
-
-
 /* ── CONTAINER PRINCIPAL DA PÁGINA ── */
 .perfil-container {
   position: relative;          /* base para o botão voltar (position: fixed) */
@@ -274,9 +265,9 @@
 }
 
 /* ── RESPONSIVO ── */
-@media (max-width: 900px) {
+@media (max-width: 480px) {
   .perfil-stats {
-    flex-direction: column; /* cards empilhados em telas menores */
+    flex-direction: column; /* cards empilhados só em celulares pequenos */
     gap: 10px;
   }
 }

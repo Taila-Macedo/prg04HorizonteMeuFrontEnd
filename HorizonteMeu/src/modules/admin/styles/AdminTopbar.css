@@ -33,15 +33,7 @@
   color: var(--branco);
 }
 
-.topbar-icon {
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.topbar-title {
-  color: var(--branco);
-}
+.topbar-icon { font-size: 20px; }
 
 .topbar-badge {
   font-size: 10px;
@@ -53,52 +45,28 @@
   margin-left: 4px;
 }
 
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-}
+.topbar-actions { display: flex; align-items: center; }
 
 .topbar-btn {
-  width: 36px;
-  height: 36px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
   border-radius: var(--border-radius-md);
   background: transparent;
   border: 1px solid transparent;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
   transition: all 0.2s ease;
-}
-
-.topbar-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--branco);
 }
 
 .topbar-btn.logout-btn:hover {
   background: rgba(255, 100, 100, 0.1);
+  border-color: rgba(255, 100, 100, 0.2);
   color: #ff6464;
 }
 
-.topbar-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--dourado-claro), var(--dourado));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--azul-profundo);
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.topbar-avatar:hover {
-  transform: scale(1.05);
-}
+.logout-label { font-size: 13px; }

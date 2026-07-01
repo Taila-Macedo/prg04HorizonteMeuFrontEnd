@@ -1,67 +1,38 @@
-/**
- * Serviço de API para o Painel de Administração
- * Lida com todas as chamadas ao backend
- */
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'; 
-
-/**
- * Utilitário para chamadas fetch com autenticação
- */
-const fetchWithAuth = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token');
+const fetchWithAuth = async (endpoint, token, options = {}) => {
   const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...(!(options.body instanceof FormData) && { 'Content-Type': 'application/json' }),
+    ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
+  const response = await fetch(`${BASE}${endpoint}`, { ...options, headers });
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
-    throw new Error(error.message || 'Erro na requisição');
+    const erro = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
+    throw new Error(erro.message || erro.mensagem || 'Erro na requisição');
   }
-
   return response.status !== 204 ? response.json() : null;
 };
 
+const extrairLista = (data) => {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.content)) return data.content;
+  return [];
+};
+
 export const adminService = {
-  // Gestão de Usuários
-  getUsers: () => fetchWithAuth('/usuarios'),
-  getUserById: (id) => fetchWithAuth(`/usuarios/${id}`),
-  deleteUser: (id) => fetchWithAuth(`/usuarios/${id}`, { method: 'DELETE' }),
-  updateUser: (id, data) => fetchWithAuth(`/usuarios/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  // Usuários — GET /usuarios retorna Page<>, extraímos .content
+  getUsers:   async (token) => extrairLista(await fetchWithAuth('/usuarios?size=100', token)),
+  getUserById: (id, token)  => fetchWithAuth(`/usuarios/${id}`, token),
+  deleteUser:  (id, token)  => fetchWithAuth(`/usuarios/${id}`, token, { method: 'DELETE' }),
+  updateUser:  (id, data, token) => fetchWithAuth(`/usuarios/${id}`, token, { method: 'PUT', body: JSON.stringify(data) }),
 
-  // Gestão de Fotos
-  getPendingPhotos: () => fetchWithAuth('/fotos/aprovacao?aprovado=false'),
-  approvePhoto: (id) => fetchWithAuth(`/fotos/aprovar/${id}`, { method: 'PATCH' }),
-  rejectPhoto: (id) => fetchWithAuth(`/fotos/${id}`, { method: 'DELETE' }),
+  // Fotos pendentes — retorna lista pura (não paginada)
+  getPendingPhotos: (token)      => fetchWithAuth('/fotos/aprovacao?aprovado=false', token),
+  approvePhoto:     (id, token)  => fetchWithAuth(`/fotos/aprovar/${id}`, token, { method: 'PATCH' }),
+  rejectPhoto:      (id, token)  => fetchWithAuth(`/fotos/${id}`, token, { method: 'DELETE' }),
 
-  // Gestão de Pontos Turísticos
-  getPoints: () => fetchWithAuth('/pontos'),
-  createPoint: (data) => fetchWithAuth('/pontos', { method: 'POST', body: JSON.stringify(data) }),
-  updatePoint: (id, data) => fetchWithAuth(`/pontos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deletePoint: (id) => fetchWithAuth(`/pontos/${id}`, { method: 'DELETE' }),
-
-  // Métricas
-  getDashboardMetrics: async () => {
-    // Exemplo de como agregar métricas se não houver um endpoint específico
-    try {
-      // Se tiver endpoint real: return fetchWithAuth('/admin/metrics');
-      // Mock para demonstração se falhar:
-      return {
-        usersCount: 1284,
-        pointsCount: 348,
-        pendingPhotosCount: 7,
-        pendingReportsCount: 4
-      };
-    } catch (e) {
-      console.error('Erro ao buscar métricas', e);
-      return null;
-    }
-  }
+  // Pontos turísticos — GET /pontos retorna Page<>, extraímos .content
+  getPoints:   async (token) => extrairLista(await fetchWithAuth('/pontos?size=100', token)),
+  deletePoint: (id, token)   => fetchWithAuth(`/pontos/${id}`, token, { method: 'DELETE' }),
 };

@@ -49,6 +49,8 @@ export function AuthProvider({ children }) {
       nome: dados.nome,
       email: dados.email,
       perfil: dados.perfil,
+      fotoPerfil: dados.fotoPerfil ?? null,
+      bio: dados.bio ?? '',
     };
     
     localStorage.setItem('hm_token', dados.token);

@@ -245,3 +245,121 @@
 .btn-confirmar-excluir:hover {
   background: #ff4d4d;
 }
+
+/* ── Modal de edição ──────────────────────────────────────────────────────── */
+.modal-editar {
+  text-align: left;
+  max-width: 440px;
+  position: relative;
+}
+
+.modal-editar h3 {
+  text-align: left;
+}
+
+.modal-editar p {
+  text-align: left;
+}
+
+.modal-fechar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.modal-fechar:hover { color: var(--branco); }
+
+.modal-subtitulo {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 20px !important;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.modal-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.modal-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--border-radius-md);
+  color: var(--branco);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.modal-input:focus { border-color: var(--dourado-claro); }
+
+.perfil-opcoes {
+  display: flex;
+  gap: 10px;
+}
+
+.perfil-btn {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.perfil-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+.perfil-btn.ativo {
+  background: rgba(240,165,0,0.15);
+  border-color: var(--dourado-claro);
+  color: var(--dourado-claro);
+}
+
+.modal-erro {
+  font-size: 12px;
+  color: #ff6464;
+  margin: 0 !important;
+}
+
+.btn-salvar-edicao {
+  background: var(--dourado-claro);
+  color: var(--azul-profundo);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.btn-salvar-edicao:hover:not(:disabled) { background: var(--dourado); }
+.btn-salvar-edicao:disabled { opacity: 0.55; cursor: not-allowed; }

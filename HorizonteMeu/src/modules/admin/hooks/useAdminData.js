@@ -1,28 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { adminService } from './useAdminService';
+import { useAuth } from '../../../shared/contexts/AuthContext';
 
-/**
- * Hook customizado para gerenciar os dados do painel de administração
- */
 export function useAdminData() {
-  const [users, setUsers] = useState([]);
-  const [photos, setPhotos] = useState([]);
+  const { token } = useAuth();
+
+  const [users,   setUsers]   = useState([]);
+  const [photos,  setPhotos]  = useState([]);
+  const [points,  setPoints]  = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error,   setError]   = useState(null);
 
   const loadData = useCallback(async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      const [usersData, photosData, metricsData] = await Promise.all([
-        adminService.getUsers().catch(() => []), // Fallback para array vazio se falhar
-        adminService.getPendingPhotos().catch(() => []),
-        adminService.getDashboardMetrics()
+      const [usersData, photosData, pointsData] = await Promise.all([
+        adminService.getUsers(token).catch(() => []),
+        adminService.getPendingPhotos(token).catch(() => []),
+        adminService.getPoints(token).catch(() => []),
       ]);
-
       setUsers(usersData);
       setPhotos(photosData);
-      setMetrics(metricsData);
+      setPoints(pointsData);
+      setMetrics({
+        usersCount:         usersData.length,
+        pointsCount:        pointsData.length,
+        pendingPhotosCount: photosData.length,
+        pendingReportsCount: 0,
+      });
       setError(null);
     } catch (err) {
       setError('Falha ao carregar dados do servidor');
@@ -30,56 +37,47 @@ export function useAdminData() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  // Ações de Usuário
   const deleteUser = async (id) => {
     try {
-      await adminService.deleteUser(id);
+      await adminService.deleteUser(id, token);
       setUsers(prev => prev.filter(u => u.id !== id));
       return true;
-    } catch (err) {
-      alert('Erro ao excluir usuário');
-      return false;
-    }
+    } catch (err) { console.error(err); return false; }
   };
 
-  // Ações de Fotos
+  const updateUser = async (id, dados) => {
+    try {
+      const atualizado = await adminService.updateUser(id, dados, token);
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, ...atualizado } : u));
+      return true;
+    } catch (err) { console.error(err); return false; }
+  };
+
   const approvePhoto = async (id) => {
     try {
-      await adminService.approvePhoto(id);
+      await adminService.approvePhoto(id, token);
       setPhotos(prev => prev.filter(p => p.id !== id));
       return true;
-    } catch (err) {
-      alert('Erro ao aprovar foto');
-      return false;
-    }
+    } catch (err) { console.error(err); return false; }
   };
 
   const rejectPhoto = async (id) => {
     try {
-      await adminService.rejectPhoto(id);
+      await adminService.rejectPhoto(id, token);
       setPhotos(prev => prev.filter(p => p.id !== id));
       return true;
-    } catch (err) {
-      alert('Erro ao rejeitar foto');
-      return false;
-    }
+    } catch (err) { console.error(err); return false; }
   };
 
   return {
-    users,
-    photos,
-    metrics,
-    loading,
-    error,
+    users, photos, points, metrics,
+    loading, error,
     refresh: loadData,
-    deleteUser,
-    approvePhoto,
-    rejectPhoto
+    deleteUser, updateUser,
+    approvePhoto, rejectPhoto,
   };
 }

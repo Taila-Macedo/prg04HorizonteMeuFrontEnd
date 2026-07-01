@@ -4,7 +4,6 @@ import { MapPin, Star, Search, SlidersHorizontal, Plus, AlertCircle } from 'luci
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { useListaPontos } from '../hooks/useListaPontos';
 import { useAuth } from '../../../shared/contexts/AuthContext';
-import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData.js';
 import '../styles/ListaPontos.css';
 
 const CATEGORIAS = [

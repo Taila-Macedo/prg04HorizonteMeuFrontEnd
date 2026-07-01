@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, MapPin, Trash2, Search } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
 import { useFavoritos } from '../hooks/useFavoritos';
-import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData.js';
 import '../styles/Favoritos.css';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';

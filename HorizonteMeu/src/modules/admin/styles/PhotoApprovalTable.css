@@ -57,6 +57,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  background: #EEF1F5;
+  color: #8893A1;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .photo-info {
@@ -125,4 +134,93 @@
 
 .btn-action svg {
   flex-shrink: 0;
+}
+
+/* ── Thumb clicável ──────────────────────────────────────────────────────── */
+.photo-thumb.clicavel {
+  cursor: zoom-in;
+  position: relative;
+}
+
+.photo-thumb.clicavel:hover img { opacity: 0.75; }
+
+.thumb-zoom {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--branco);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.photo-thumb.clicavel:hover .thumb-zoom { opacity: 1; }
+
+/* ── Lightbox ────────────────────────────────────────────────────────────── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lightbox-in 0.18s ease;
+}
+
+@keyframes lightbox-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lightbox-fechar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--branco);
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 1001;
+}
+.lightbox-fechar:hover { background: rgba(255,255,255,0.2); }
+
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 75vh;
+  border-radius: 10px;
+  object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+.lightbox-legenda {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--branco);
+  text-align: center;
+  margin: 0;
+}
+
+.lightbox-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  margin: 0;
 }

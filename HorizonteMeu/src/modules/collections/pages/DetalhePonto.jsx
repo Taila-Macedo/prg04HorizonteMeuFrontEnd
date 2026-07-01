@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Heart, Camera, MessageCircle, Map, Route, X, ImagePlus, Check, Edit2 } from 'lucide-react';
 import { Navigation } from '../../../shared/components/Navigation/Navigation';
-import { CATEGORIA_LABEL } from '../../../shared/mocks/mockData';
 import { ComentariosSecao } from '../../comments/components/ComentariosSecao';
 import { useUploadFoto } from '../../../shared/hooks/useUploadFoto';
 import { useAuth } from '../../../shared/contexts/AuthContext';

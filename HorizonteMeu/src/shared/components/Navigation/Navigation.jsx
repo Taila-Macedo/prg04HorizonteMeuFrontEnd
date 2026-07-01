@@ -1,12 +1,14 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, Bell, Route, User, MapPin } from 'lucide-react';
+import { Search, Heart, Bell, Route, User, MapPin, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import './Navigation.css';
 
 export const Navigation = forwardRef(function Navigation(
   { aoPesquisar, esconderBusca = false },
   ref
 ) {
+  const { usuario, estaLogado, eAdmin } = useAuth();
   const [pesquisa, setPesquisa] = useState('');
   const [coracaoPulsando, setCoracaoPulsando] = useState(false);
   const coracaoRef = useRef(null);
@@ -64,14 +66,36 @@ export const Navigation = forwardRef(function Navigation(
           />
         </Link>
 
+        {/* TODO: apontar para /notificacoes quando o módulo notifications/ for implementado */}
         <Link to="/perfil" className="nav-action-btn nav-notificacao" title="Notificações">
           <Bell size={20} />
           <span className="nav-notification-badge"></span>
         </Link>
 
-        <Link to="/admin" className="nav-action-btn" title="Painel de Admin">
+        {/* Painel de Admin — só aparece pra quem tem perfil ADMINISTRADOR */}
+        {eAdmin && (
+          <Link to="/admin" className="nav-action-btn" title="Painel de Admin">
+            <ShieldCheck size={20} />
+          </Link>
+        )}
+
+        {/* Botão de conta: se logado, leva ao perfil (mostra avatar/nome);
+            se por algum motivo cair aqui deslogado, leva ao login */}
+        <Link
+          to={estaLogado ? '/perfil' : '/login'}
+          className="nav-action-btn"
+          title={estaLogado ? usuario?.nome || 'Meu Perfil' : 'Entrar'}
+        >
           <div className="nav-user-avatar">
-            <User size={20} color="#ffffff" />
+            {estaLogado && usuario?.fotoPerfil ? (
+              <img
+                src={usuario.fotoPerfil}
+                alt={usuario.nome}
+                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+              />
+            ) : (
+              <User size={20} color="#ffffff" />
+            )}
           </div>
         </Link>
       </div>

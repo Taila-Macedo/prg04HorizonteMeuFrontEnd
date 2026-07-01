@@ -1,106 +1,92 @@
-import React from 'react';
-import { Check, X, Waves, Building2, Mountain, Trees } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, X, ImageOff, ZoomIn } from 'lucide-react';
 import '../styles/PhotoApprovalTable.css';
 
-const iconMap = {
-  waves:    { icon: Waves,    color: '#185FA5', bg: '#E6F1FB' },
-  building: { icon: Building2, color: '#534AB7', bg: '#EEEDFE' },
-  mountain: { icon: Mountain,  color: '#3B6D11', bg: '#EAF3DE' },
-  trees:    { icon: Trees,     color: '#0F6E56', bg: '#E1F5EE' },
-};
+function formatarData(dataIso) {
+  if (!dataIso) return '—';
+  try { return new Date(`${dataIso}T00:00:00`).toLocaleDateString('pt-BR'); }
+  catch { return dataIso; }
+}
 
-const defaultPhotos = [
-  { id: 1, name: 'Pôr do sol na praia', location: 'Jericoacoara', user: '@maria_s',  date: 'há 3 dias', iconType: 'waves'    },
-  { id: 2, name: 'Fachada principal',   location: 'Louvre',       user: '@joao_v',   date: 'há 2 dias', iconType: 'building' },
-  { id: 3, name: 'Vista do topo',       location: 'Machu Picchu', user: '@carla_m',  date: 'há 1 dia',  iconType: 'mountain' },
-  { id: 4, name: 'Cachoeira da trilha', location: 'Chapada',      user: '@pedro_r',  date: 'há 8 h',    iconType: 'trees'    },
-];
+function PhotoApprovalTable({ photos = [], confirmandoId, confirmandoAcao, onPedirConfirmacao, onConfirmar, onCancelar }) {
+  const [fotoAberta, setFotoAberta] = useState(null);
 
-function PhotoApprovalTable({
-  photos = [],
-  confirmandoId,
-  confirmandoAcao,
-  onPedirConfirmacao,
-  onConfirmar,
-  onCancelar,
-}) {
-  const displayPhotos = photos.length > 0 ? photos : defaultPhotos;
+  if (photos.length === 0) {
+    return (
+      <div className="photo-table-wrapper">
+        <p className="placeholder-content">Nenhuma foto pendente de aprovação no momento.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="photo-table-wrapper">
-      <table className="photo-table">
-        <thead>
-          <tr>
-            <th>Foto / ponto</th>
-            <th>Enviada</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayPhotos.map((photo) => {
-            const iconData = iconMap[photo.iconType] || iconMap.waves;
-            const IconComponent = iconData.icon;
-            const esteConfirmando = confirmandoId === photo.id;
+    <>
+      <div className="photo-table-wrapper">
+        <table className="photo-table">
+          <thead>
+            <tr>
+              <th>Foto / legenda</th>
+              <th>Enviada em</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {photos.map((photo) => {
+              const esteConfirmando = confirmandoId === photo.id;
+              return (
+                <tr key={photo.id}>
+                  <td>
+                    <div className="photo-row">
+                      <div
+                        className={`photo-thumb ${photo.url ? 'clicavel' : ''}`}
+                        onClick={() => photo.url && setFotoAberta(photo)}
+                        title={photo.url ? 'Clique para ampliar' : ''}
+                      >
+                        {photo.url
+                          ? <><img src={photo.url} alt={photo.legenda || 'Foto enviada'} /><span className="thumb-zoom"><ZoomIn size={14} /></span></>
+                          : <ImageOff size={20} />
+                        }
+                      </div>
+                      <div className="photo-info">
+                        <div className="photo-name">{photo.legenda || 'Sem legenda'}</div>
+                        <div className="photo-meta">Ponto #{photo.idPontoTuristico} · Usuário #{photo.idUsuario}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="photo-date">{formatarData(photo.dataUpload)}</td>
+                  <td>
+                    {esteConfirmando ? (
+                      <div className="action-confirm-inline">
+                        <span className="confirm-pergunta">{confirmandoAcao === 'aprovar' ? 'Aprovar?' : 'Rejeitar?'}</span>
+                        <button className="btn-action approve" onClick={() => onConfirmar(photo.id)}><Check size={14} /> Sim</button>
+                        <button className="btn-action reject"  onClick={onCancelar}><X size={14} /> Não</button>
+                      </div>
+                    ) : (
+                      <div className="action-buttons">
+                        <button className="btn-action approve" onClick={() => onPedirConfirmacao(photo.id, 'aprovar')}><Check size={14} /><span>Aprovar</span></button>
+                        <button className="btn-action reject"  onClick={() => onPedirConfirmacao(photo.id, 'rejeitar')}><X size={14} /><span>Rejeitar</span></button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-            return (
-              <tr key={photo.id}>
-                <td>
-                  <div className="photo-row">
-                    <div className="photo-thumb" style={{ background: iconData.bg }}>
-                      <IconComponent size={20} color={iconData.color} />
-                    </div>
-                    <div className="photo-info">
-                      <div className="photo-name">{photo.name}</div>
-                      <div className="photo-meta">{photo.location} · {photo.user}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="photo-date">{photo.date}</td>
-                <td>
-                  {/* Confirmação inline — substitui alert() */}
-                  {esteConfirmando ? (
-                    <div className="action-confirm-inline">
-                      <span className="confirm-pergunta">
-                        {confirmandoAcao === 'aprovar' ? 'Aprovar?' : 'Rejeitar?'}
-                      </span>
-                      <button
-                        className="btn-action approve"
-                        onClick={() => onConfirmar(photo.id)}
-                      >
-                        <Check size={14} /> Sim
-                      </button>
-                      <button
-                        className="btn-action reject"
-                        onClick={onCancelar}
-                      >
-                        <X size={14} /> Não
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="action-buttons">
-                      <button
-                        className="btn-action approve"
-                        onClick={() => onPedirConfirmacao(photo.id, 'aprovar')}
-                        title="Aprovar"
-                      >
-                        <Check size={14} /><span>Aprovar</span>
-                      </button>
-                      <button
-                        className="btn-action reject"
-                        onClick={() => onPedirConfirmacao(photo.id, 'rejeitar')}
-                        title="Rejeitar"
-                      >
-                        <X size={14} /><span>Rejeitar</span>
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+      {/* Lightbox */}
+      {fotoAberta && (
+        <div className="lightbox-overlay" onClick={() => setFotoAberta(null)}>
+          <button className="lightbox-fechar" onClick={() => setFotoAberta(null)}><X size={22} /></button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={fotoAberta.url} alt={fotoAberta.legenda || 'Foto'} />
+            {fotoAberta.legenda && <p className="lightbox-legenda">{fotoAberta.legenda}</p>}
+            <p className="lightbox-meta">Ponto #{fotoAberta.idPontoTuristico} · Usuário #{fotoAberta.idUsuario} · {formatarData(fotoAberta.dataUpload)}</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -1,0 +1,53 @@
+.points-form-modal {
+  max-width: 600px;
+  width: 92%;
+  text-align: left;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.points-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.points-form-header h3 {
+  margin: 0;
+}
+
+.points-form-fechar {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.points-form-fechar:hover:not(:disabled) {
+  background: rgba(255, 100, 100, 0.1);
+  color: #ff6464;
+  border-color: #ff6464;
+}
+
+.points-form-modal .form-ponto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.points-form-modal .campo-erro-api {
+  background: rgba(255, 100, 100, 0.1);
+  border: 1px solid #ff6464;
+  color: #ff6464;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}

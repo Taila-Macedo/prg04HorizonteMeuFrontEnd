@@ -217,3 +217,132 @@ body {
   white-space: nowrap;
   margin-right: 2px;
 }
+
+/* ── Lista rápida de pontos turísticos (card do dashboard) ──────────────── */
+.points-quick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.points-quick-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.points-quick-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.points-quick-meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+/* ── Tabela de pontos turísticos ─────────────────────────────────────────── */
+.section-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.btn-novo-ponto {
+  background: var(--dourado-claro);
+  color: var(--azul-profundo);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.btn-novo-ponto:hover { background: var(--dourado); transform: translateY(-1px); }
+
+/* Herda .table-wrapper e .id-badge do PainelAdm via escopo global */
+#tabela-pontos {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--branco);
+}
+
+#tabela-pontos th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
+}
+
+#tabela-pontos td {
+  padding: 14px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+#tabela-pontos tr:last-child td { border-bottom: none; }
+
+.ponto-nome-cell {
+  font-weight: 600;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.categoria-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.5px;
+}
+
+/* Botões pequenos de confirmação inline (pontos) */
+.btn-action-sm {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+.btn-action-sm.confirmar {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ff6464;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.btn-action-sm.confirmar:hover { background: rgba(239,68,68,0.25); }
+.btn-action-sm.cancelar {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.65);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.btn-action-sm.cancelar:hover { background: rgba(255,255,255,0.1); }

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  LayoutDashboard,
-  Image,
-  AlertTriangle,
-  MapPin,
-  Users,
-  Settings,
-} from 'lucide-react';
+import { LayoutDashboard, Image, AlertTriangle, MapPin, Users } from 'lucide-react';
 import '../styles/AdminSidebar.css';
 
 function AdminSidebar({ activeSection, onSectionChange, pendingPhotos = 0, pendingReports = 0 }) {
@@ -22,9 +15,8 @@ function AdminSidebar({ activeSection, onSectionChange, pendingPhotos = 0, pendi
       id: 'moderation',
       label: 'Moderação',
       items: [
-        // Badges dinâmicos: só aparecem se o número for maior que zero
-        { id: 'photos',  icon: Image,          label: 'Fotos pendentes', badge: pendingPhotos  > 0 ? String(pendingPhotos)  : null, badgeColor: 'amber' },
-        { id: 'reports', icon: AlertTriangle,   label: 'Denúncias',      badge: pendingReports > 0 ? String(pendingReports) : null, badgeColor: 'red'   },
+        { id: 'photos',  icon: Image,         label: 'Fotos pendentes', badge: pendingPhotos  > 0 ? String(pendingPhotos)  : null, badgeColor: 'amber' },
+        { id: 'reports', icon: AlertTriangle,  label: 'Denúncias',      badge: pendingReports > 0 ? String(pendingReports) : null, badgeColor: 'red'   },
       ],
     },
     {
@@ -33,14 +25,6 @@ function AdminSidebar({ activeSection, onSectionChange, pendingPhotos = 0, pendi
       items: [
         { id: 'points', icon: MapPin,  label: 'Pontos turísticos', badge: null },
         { id: 'users',  icon: Users,   label: 'Usuários',          badge: null },
-      ],
-    },
-    {
-      id: 'system',
-      label: 'Sistema',
-      items: [
-        // Badges removida desta seção — não existe no backend
-        { id: 'settings', icon: Settings, label: 'Configurações', badge: null },
       ],
     },
   ];

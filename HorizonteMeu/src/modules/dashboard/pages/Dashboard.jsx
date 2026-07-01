@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Navigation } from "../../../shared/components/Navigation/Navigation";
 import { Mapa3D } from "../../maps/pages/Mapa3D";
 import SpotCard from "../../../shared/components/Navigation/Card";
-import { PONTOS_MOCK, CATEGORIA_PARA_FILTRO } from '../../../shared/mocks/mockData';
 
 import '../styles/Dashboard.css';
 import '../../../shared/components/Navigation/Card.css';
