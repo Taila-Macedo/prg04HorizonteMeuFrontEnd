@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navigation } from "../../../shared/components/Navigation/Navigation";
 import { Mapa3D } from "../../maps/pages/Mapa3D";
 import SpotCard from "../../../shared/components/Navigation/Card";
@@ -7,70 +8,84 @@ import '../styles/Dashboard.css';
 import '../../../shared/components/Navigation/Card.css';
 import '../../../shared/components/Navigation/PainelLateral.css';
 
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+const normalizar = (str = '') =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
 export default function Dashboard() {
-  const [pontosNoMapa, setPontosNoMapa] = useState([
-    { id: 1, nome: "Torre Eiffel", coordinates: [2.2945, 48.8584], paisKey: "france" }
-  ]);
+  const navigate = useNavigate();
 
-  const [paisPesquisado, setPaisPesquisado] = useState("");
+  const [pontos, setPontos] = useState([]);   // só os pontos com noMapa3D = true
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
+
+  const [busca, setBusca] = useState('');
   const [painelAberto, setPainelAberto] = useState(false);
-  const [todosCards, setTodosCards] = useState([]);
 
-  const [filtros, setFiltros] = useState({
-    praias:     true,
-    montanhas:  true,
-    museus:     true,
-    monumentos: true,
-    parques:    true,
-  });
+  // Busca os pontos da API e mantém apenas os marcados para o mapa 3D
+  useEffect(() => {
+    const carregar = async () => {
+      try {
+        setCarregando(true);
+        setErro('');
+        const token = localStorage.getItem('hm_token');
+        const res = await fetch(`${BASE}/pontos?page=0&size=100`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+        if (!res.ok) throw new Error('Erro ao carregar pontos turísticos.');
 
-  const alternarFiltro = (chave) => {
-    setFiltros(prev => ({ ...prev, [chave]: !prev[chave] }));
-  };
+        const data = await res.json();
+        const lista = Array.isArray(data.content) ? data.content : [];
+        setPontos(lista.filter((p) => p.noMapa3D === true));
+      } catch (err) {
+        setErro(err.message || 'Erro ao carregar pontos.');
+        setPontos([]);
+      } finally {
+        setCarregando(false);
+      }
+    };
+    carregar();
+  }, []);
 
-  const cardsExibir = todosCards.filter(card => {
-    const chave = CATEGORIA_PARA_FILTRO[card.categoria];
-    if (!chave) return true;
-    return filtros[chave];
-  });
+  // Aplica apenas a busca por nome/cidade/país
+  const pontosFiltrados = useMemo(() => {
+    if (!busca.trim()) return pontos;
+    const termo = normalizar(busca);
+    return pontos.filter((p) =>
+      normalizar(`${p.nome} ${p.cidade} ${p.pais}`).includes(termo)
+    );
+  }, [pontos, busca]);
+
+  // Coordenadas do primeiro resultado da busca, para dar zoom no mapa
+  const focoCoordenadas = useMemo(() => {
+    if (!busca.trim() || pontosFiltrados.length === 0) return null;
+    const alvo = pontosFiltrados[0];
+    return [Number(alvo.longitude), Number(alvo.latitude)];
+  }, [busca, pontosFiltrados]);
+
+  // Marcadores do mapa: [longitude, latitude]
+  const pontosNoMapa = useMemo(
+    () =>
+      pontosFiltrados.map((p) => ({
+        id: p.id,
+        nome: p.nome,
+        coordinates: [Number(p.longitude), Number(p.latitude)],
+      })),
+    [pontosFiltrados]
+  );
 
   const lidarComPesquisa = (termo) => {
-    const normalizar = (str) =>
-      str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-
-    const termoNorm = normalizar(termo);
-    const chaveEncontrada = Object.keys(PONTOS_MOCK).find(
-      chave => normalizar(chave) === termoNorm ||
-               (chave === 'france' && (termoNorm === 'franca' || termoNorm === 'france'))
-    );
-
-    if (chaveEncontrada) {
-      const dados = PONTOS_MOCK[chaveEncontrada];
-      const nomeExibir = chaveEncontrada === "france" ? "França" : chaveEncontrada;
-
-      setPaisPesquisado(nomeExibir);
-      setTodosCards(dados);
-      setPainelAberto(true);
-
-      const novosMarcadores = dados.map(item => ({
-        id: item.id,
-        nome: item.nome,
-        coordinates: [item.longitude, item.latitude],
-        paisKey: chaveEncontrada
-      }));
-      setPontosNoMapa(novosMarcadores);
-    } else {
-      alert("Tente pesquisar por 'França'");
-    }
+    setBusca(termo);
+    setPainelAberto(true);
   };
 
-  const lidarComCliqueNoPino = (pontoClicado) => {
-    if (pontoClicado.paisKey && PONTOS_MOCK[pontoClicado.paisKey]) {
-      const nomeExibir = pontoClicado.paisKey === "france" ? "França" : pontoClicado.paisKey;
-      setPaisPesquisado(nomeExibir);
-      setTodosCards(PONTOS_MOCK[pontoClicado.paisKey]);
-      setPainelAberto(true);
-    }
+  // Clique no pino/nome do ponto -> vai para o detalhe
+  const lidarComCliqueNoPino = (ponto) => {
+    if (ponto?.id) navigate(`/pontos/${ponto.id}`);
   };
 
   return (
@@ -78,53 +93,35 @@ export default function Dashboard() {
       <Navigation aoPesquisar={lidarComPesquisa} />
 
       <div className="dashboard-main-content">
-
-        <aside className="painel-filtros-esquerdo">
-          <div className="filtros-lista">
-            <button className={`filtro-btn ${filtros.praias ? 'ativo' : ''}`} onClick={() => alternarFiltro('praias')}>
-              <span>🏖️</span> Praias
-            </button>
-            <button className={`filtro-btn ${filtros.montanhas ? 'ativo' : ''}`} onClick={() => alternarFiltro('montanhas')}>
-              <span>⛰️</span> Montanhas
-            </button>
-            <button className={`filtro-btn ${filtros.museus ? 'ativo' : ''}`} onClick={() => alternarFiltro('museus')}>
-              <span>🏛️</span> Museus
-            </button>
-            <button className={`filtro-btn ${filtros.monumentos ? 'ativo' : ''}`} onClick={() => alternarFiltro('monumentos')}>
-              <span>🗿</span> Monumentos
-            </button>
-            <button className={`filtro-btn ${filtros.parques ? 'ativo' : ''}`} onClick={() => alternarFiltro('parques')}>
-              <span>🌳</span> Parques
-            </button>
-          </div>
-        </aside>
-
         <div className="map-placeholder">
           <Mapa3D
             pontosTuristicos={pontosNoMapa}
             aoSelecionarPonto={lidarComCliqueNoPino}
-            paisFoco={paisPesquisado}
+            focoCoordenadas={focoCoordenadas}
           />
         </div>
 
         <div className={`painel-lateral-cards ${painelAberto ? "" : "escondido"}`}>
           <div className="painel-header">
-            <h2>{paisPesquisado}</h2>
+            <h2>Pontos no mapa</h2>
             <button className="btn-fechar-painel" onClick={() => setPainelAberto(false)}>✕</button>
           </div>
           <div className="lista-de-cards-scroll space-y-6">
-            {cardsExibir.length > 0 ? (
-              cardsExibir.map((card) => (
-                <SpotCard key={card.id} item={card} />
-              ))
+            {carregando ? (
+              <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '2rem 1rem' }}>
+                Carregando pontos...
+              </p>
+            ) : erro ? (
+              <p style={{ color: '#ff8a8a', textAlign: 'center', padding: '2rem 1rem' }}>{erro}</p>
+            ) : pontosFiltrados.length > 0 ? (
+              pontosFiltrados.map((card) => <SpotCard key={card.id} item={card} />)
             ) : (
               <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', textAlign: 'center', padding: '2rem 1rem' }}>
-                Nenhum ponto corresponde aos filtros ativos.
+                Nenhum ponto corresponde à busca.
               </p>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

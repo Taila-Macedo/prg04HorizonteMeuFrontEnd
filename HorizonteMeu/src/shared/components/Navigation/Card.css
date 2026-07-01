@@ -190,3 +190,11 @@ p {
 .icon-btn-favorite:hover {
     background: rgba(255, 255, 255, 0.12);
 }
+
+.image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.03);
+}

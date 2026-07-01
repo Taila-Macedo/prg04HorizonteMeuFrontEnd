@@ -159,6 +159,21 @@ export default function AdicionarPonto() {
             clicando com o botão direito no local.
           </p>
 
+                    {/* NOVO: pergunta se o ponto vai para o mapa 3D */}
+          <div className="campo-grupo">
+            <label className="campo-checkbox">
+              <input
+                type="checkbox"
+                checked={form.noMapa3D}
+                onChange={(e) => handleChange('noMapa3D', e.target.checked)}
+              />
+              <span>Mostrar este ponto no mapa 3D da dashboard</span>
+            </label>
+            <span className="campo-dica">
+              Marque apenas os pontos mais famosos que você quer destacar no mapa.
+            </span>
+          </div>
+
           {/* Erro da API */}
           {erroApi && (
             <div className="campo-erro-api">

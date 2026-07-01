@@ -12,6 +12,7 @@ const FORM_INICIAL = {
   pais: '',
   latitude: '',
   longitude: '',
+  noMapa3D: false, // NOVO
 };
 
 function validar(form) {
@@ -36,7 +37,7 @@ function validar(form) {
 export function useAdicionarPonto() {
   const navigate = useNavigate();
   const { token } = useAuth();
-  
+
   const [form, setForm] = useState(FORM_INICIAL);
   const [touched, setTouched] = useState({});
   const [salvando, setSalvando] = useState(false);
@@ -56,7 +57,6 @@ export function useAdicionarPonto() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Marca todos os campos como tocados para exibir erros
     const todosTocados = Object.keys(FORM_INICIAL).reduce((acc, k) => ({ ...acc, [k]: true }), {});
     setTouched(todosTocados);
 
@@ -74,6 +74,7 @@ export function useAdicionarPonto() {
         pais: form.pais.trim(),
         latitude: Number(form.latitude),
         longitude: Number(form.longitude),
+        noMapa3D: form.noMapa3D, // NOVO
       };
 
       const res = await fetch(`${BASE}/pontos`, {
@@ -96,7 +97,6 @@ export function useAdicionarPonto() {
         throw new Error(mensagem);
       }
 
-      // Ponto criado com sucesso — redireciona para listagem
       navigate('/pontos');
     } catch (err) {
       setErroApi(err.message || 'Erro ao criar ponto turístico. Tente novamente.');

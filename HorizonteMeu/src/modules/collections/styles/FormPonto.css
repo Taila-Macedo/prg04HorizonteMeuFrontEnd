@@ -324,6 +324,19 @@
   transition: all 0.2s;
 }
 
+.campo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.campo-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
 .btn-confirmar-nao:hover {
   border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;

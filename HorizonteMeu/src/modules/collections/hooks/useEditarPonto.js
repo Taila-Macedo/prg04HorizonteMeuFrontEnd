@@ -29,7 +29,14 @@ export function useEditarPonto() {
   const { token } = useAuth();
 
   const [form, setForm] = useState({
-    nome: '', categoria: '', descricao: '', cidade: '', pais: '', latitude: '', longitude: '',
+    nome: '', 
+    categoria: '', 
+    descricao: '', 
+    cidade: '', 
+    pais: '', 
+    latitude: '', 
+    longitude: '',
+    noMapa3D: false, // 1. ALTERADO: Adicionado ao estado inicial
   });
   const [touched, setTouched] = useState({});
   const [carregando, setCarregando] = useState(true);
@@ -62,6 +69,7 @@ export function useEditarPonto() {
           pais: ponto.pais ?? '',
           latitude: ponto.latitude?.toString() ?? '',
           longitude: ponto.longitude?.toString() ?? '',
+          noMapa3D: ponto.noMapa3D ?? false, // 2. ALTERADO: Mapeando a resposta da API
         });
       } catch (err) {
         setErroApi(err.message || 'Erro ao carregar ponto turístico.');
@@ -104,6 +112,7 @@ export function useEditarPonto() {
         pais: form.pais.trim(),
         latitude: Number(form.latitude),
         longitude: Number(form.longitude),
+        noMapa3D: form.noMapa3D, // 3. ALTERADO: Adicionado ao payload de envio (PUT)
       };
 
       const res = await fetch(`${BASE}/pontos/${id}`, {

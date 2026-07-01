@@ -17,12 +17,7 @@ const oceanos = [
   { nome: "OCEANO GLACIAL ANTÁRTICO", coordinates: [0, -68] } // Posicionado na calota sul, antes da Antártica
 ];
 
-// Dicionário com as coordenadas exatas de centro e zoom para cada país pesquisado
-const COORDENADAS_PAISES = {
-  "França": { centro: [2.2137, 46.2276], escala: 650 }
-};
-
-export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto, paisFoco }) {
+export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto, focoCoordenadas }) {
   // Estado que armazena os dados geográficos dos países após o carregamento da API
   const [dadosDoMapaJson, setDadosDoMapaJson] = useState({ features: [] });
   
@@ -62,14 +57,18 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto, paisFoco }) {
     return () => container.removeEventListener('wheel', handleWheelNative);
   }, []);
 
-  // NOVO: Hook que monitora a propriedade paisFoco para mover o mapa e aplicar zoom automaticamente
+  // Hook que monitora focoCoordenadas para mover o mapa e aplicar zoom automaticamente no resultado da busca
   useEffect(() => {
-    if (paisFoco && COORDENADAS_PAISES[paisFoco]) {
-      const { centro: novoCentro, escala: novaEscala } = COORDENADAS_PAISES[paisFoco];
-      setCentro(novoCentro);
-      setEscala(novaEscala);
+    if (
+      focoCoordenadas &&
+      Array.isArray(focoCoordenadas) &&
+      !isNaN(focoCoordenadas[0]) &&
+      !isNaN(focoCoordenadas[1])
+    ) {
+      setCentro(focoCoordenadas);
+      setEscala(900); // nível de zoom ao focar em um ponto específico
     }
-  }, [paisFoco]);
+  }, [focoCoordenadas]);
 
   // Inicia o estado de arrasto e captura as coordenadas iniciais do clique do mouse
   const handleMouseDown = (e) => {
@@ -242,9 +241,8 @@ export function Mapa3D({ pontosTuristicos = [], aoSelecionarPonto, paisFoco }) {
         {pontosExibir.map((ponto, i) => {
           let coords = [0, 0];
           if (ponto.coordinates && ponto.coordinates.length === 2) {
-            const c0 = ponto.coordinates[0];
-            const c1 = ponto.coordinates[1];
-            coords = Math.abs(c0) < Math.abs(c1) ? [c0, c1] : [c1, c0];
+            // já vem no formato correto [longitude, latitude]
+            coords = [Number(ponto.coordinates[0]), Number(ponto.coordinates[1])];
           } else {
             coords = [Number(ponto.longitude || ponto.lng), Number(ponto.latitude || ponto.lat)];
           }

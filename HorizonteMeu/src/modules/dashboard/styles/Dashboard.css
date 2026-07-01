@@ -42,65 +42,6 @@
   z-index: 1;
 }
 
-/* 3. DESIGN DOS PAINÉIS FLUTUANTES (Esquerdo e Direito) */
-/* CONTAINER DOS FILTROS (ESQUERDO) */
-.painel-filtros-esquerdo {
-  pointer-events: auto;
-  z-index: 5;
-  width: 200px; /* Mais estreito e minimalista apenas para os botões */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: none; /* Remove qualquer fundo pesado de caixa */
-  border: none;
-  padding: 0;
-  box-shadow: none;
-}
-
-.filtros-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* Espaçamento vertical sutil entre os botões */
-}
-
-/* O BOTÃO EM FORMATO DE PÍLULA (IGUAL À CAPTURA) */
-.filtro-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 20px;
-  background-color: rgba(26, 38, 57, 0.7); /* Azul escuro semi-transparente de fundo */
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Borda fina cinza/branca */
-  border-radius: 30px; /* Garante o formato pílula perfeito */
-  color: #ffffff;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  width: max-content; /* O botão abraça apenas o tamanho do texto */
-  transition: all 0.2s ease;
-}
-
-/* Efeito de hover ao passar o mouse */
-.filtro-btn:hover {
-  background-color: rgba(40, 56, 82, 0.9);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-/* ESTADO ATIVO: Quando o filtro estiver ligado (Opcional - mude a cor se quiser destacar) */
-.filtro-btn.ativo {
-  border-color: var(--dourado-claro);
-  background-color: rgba(26, 38, 57, 0.9);
-  box-shadow: 0 0 8px rgba(255, 201, 74, 0.2);
-}
-
-/* Ícone dentro do botão */
-.filtro-btn span {
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* Customização específica do painel direito (Cards) */
 .painel-lateral-cards {

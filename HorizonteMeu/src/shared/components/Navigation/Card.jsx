@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Heart, Star, Landmark } from 'lucide-react';
 import { useFavoritos } from '../../../modules/favorites/hooks/useFavoritos';
 import './Card.css';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function SpotCard({ item }) {
   const navigate = useNavigate();
@@ -17,6 +19,31 @@ export default function SpotCard({ item }) {
     pais: 'Canadá',
     img: 'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?w=600&q=80',
   };
+
+  const [fotoUrl, setFotoUrl] = useState(dados.img || null);
+
+  // Busca a primeira foto do ponto no endpoint de fotos
+  useEffect(() => {
+    if (!dados.id || dados.img) return; // já tem imagem padrão (mock), não busca
+
+    let cancelado = false;
+
+    const carregarFoto = async () => {
+      try {
+        const res = await fetch(`${BASE}/fotos/ponto/${dados.id}`);
+        if (!res.ok) return;
+        const lista = await res.json();
+        if (!cancelado && Array.isArray(lista) && lista.length > 0) {
+          setFotoUrl(lista[0].url);
+        }
+      } catch {
+        // silenciosamente ignora, mantém placeholder
+      }
+    };
+
+    carregarFoto();
+    return () => { cancelado = true; };
+  }, [dados.id, dados.img]);
 
   const irParaDetalhe = () => {
     if (dados.id) navigate(`/pontos/${dados.id}`);
@@ -37,7 +64,13 @@ export default function SpotCard({ item }) {
   return (
     <div className="card" onClick={irParaDetalhe}>
       <div className="image-container">
-        <img className="image" src={dados.url || dados.img} alt={dados.nome} />
+        {fotoUrl ? (
+          <img className="image" src={fotoUrl} alt={dados.nome} />
+        ) : (
+          <div className="image image-placeholder">
+            <Landmark size={28} />
+          </div>
+        )}
         <div className="tag-monumento">
           <Landmark size={12} />
           {dados.categoria}
