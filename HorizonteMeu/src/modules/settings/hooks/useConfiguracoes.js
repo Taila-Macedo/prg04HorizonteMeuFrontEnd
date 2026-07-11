@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -49,7 +50,7 @@ export function useConfiguracoes() {
     }
     setSalvando(true);
     try {
-      const res = await fetch(`${BASE}/usuarios/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/usuarios/${usuario.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ export function useConfiguracoes() {
       const formData = new FormData();
       formData.append('arquivo', arquivo);
 
-      const uploadRes = await fetch(`${BASE}/fotos/upload`, {
+      const uploadRes = await apiFetch(`${BASE}/fotos/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
@@ -97,7 +98,7 @@ export function useConfiguracoes() {
       const { url } = await uploadRes.json();
 
       // 2. Salva a URL no perfil do usuário
-      const res = await fetch(`${BASE}/usuarios/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/usuarios/${usuario.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +157,7 @@ export function useConfiguracoes() {
 
     setSalvando(true);
     try {
-      const res = await fetch(`${BASE}/usuarios/${usuario.id}/senha`, {
+      const res = await apiFetch(`${BASE}/usuarios/${usuario.id}/senha`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +193,7 @@ export function useConfiguracoes() {
 
     setSalvando(true);
     try {
-      const res = await fetch(`${BASE}/usuarios/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/usuarios/${usuario.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });

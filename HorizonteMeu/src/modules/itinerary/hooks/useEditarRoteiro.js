@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -39,10 +40,10 @@ export function useEditarRoteiro() {
     setNaoEncontrado(false);
     try {
       const [resRoteiro, resPontos] = await Promise.all([
-        fetch(`${BASE}/roteiros/${id}`, {
+        apiFetch(`${BASE}/roteiros/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-        fetch(`${BASE}/pontos?page=0&size=100`, {
+        apiFetch(`${BASE}/pontos?page=0&size=100`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ]);
@@ -149,7 +150,7 @@ export function useEditarRoteiro() {
         })),
       };
 
-      const res = await fetch(`${BASE}/roteiros/${id}`, {
+      const res = await apiFetch(`${BASE}/roteiros/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

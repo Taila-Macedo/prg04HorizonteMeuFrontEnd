@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -19,7 +20,7 @@ export function usePerfilDados() {
     if (!usuario?.id || !token) return;
     setCarregandoFavoritos(true);
     try {
-      const res = await fetch(`${BASE}/favoritos/usuario/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/favoritos/usuario/${usuario.id}`, {
         headers: authHeader,
       });
       if (!res.ok) throw new Error('Erro ao carregar favoritos.');
@@ -29,7 +30,7 @@ export function usePerfilDados() {
       const comDados = await Promise.all(
         (Array.isArray(favs) ? favs : []).map(async (fav) => {
           try {
-            const resPonto = await fetch(`${BASE}/pontos/${fav.idPontoTuristico}`, {
+            const resPonto = await apiFetch(`${BASE}/pontos/${fav.idPontoTuristico}`, {
               headers: authHeader,
             });
             const ponto = resPonto.ok ? await resPonto.json() : null;
@@ -53,7 +54,7 @@ export function usePerfilDados() {
     if (!usuario?.id || !token) return;
     setCarregandoRoteiros(true);
     try {
-      const res = await fetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
         headers: authHeader,
       });
       if (!res.ok) throw new Error('Erro ao carregar roteiros.');
@@ -73,7 +74,7 @@ export function usePerfilDados() {
 
   const removerFavorito = async (favoritoId) => {
     try {
-      const res = await fetch(`${BASE}/favoritos/${favoritoId}`, {
+      const res = await apiFetch(`${BASE}/favoritos/${favoritoId}`, {
         method: 'DELETE',
         headers: authHeader,
       });

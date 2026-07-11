@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 
+import { apiFetch } from '../../../shared/utils/apiFetch';
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export function useListaRoteiros() {
@@ -17,7 +18,7 @@ export function useListaRoteiros() {
     try {
       setLoading(true);
       setErro('');
-      const res = await fetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/roteiros/usuario/${usuario.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -57,7 +58,7 @@ export function useListaRoteiros() {
   const confirmarDelecao = async (id, e) => {
     e.stopPropagation();
     try {
-      const res = await fetch(`${BASE}/roteiros/${id}`, {
+      const res = await apiFetch(`${BASE}/roteiros/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

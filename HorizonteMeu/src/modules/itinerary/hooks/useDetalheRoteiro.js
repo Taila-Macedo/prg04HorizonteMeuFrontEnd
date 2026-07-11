@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -21,7 +22,7 @@ export function useDetalheRoteiro() {
     setLoading(true);
     setNaoEncontrado(false);
     try {
-      const res = await fetch(`${BASE}/roteiros/${id}`, {
+      const res = await apiFetch(`${BASE}/roteiros/${id}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
 
@@ -65,7 +66,7 @@ export function useDetalheRoteiro() {
     }));
 
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         `${BASE}/roteiros/pontos/${idRoteiroPonto}?visitado=${novoValor}`,
         {
           method: 'PATCH',
@@ -90,7 +91,7 @@ export function useDetalheRoteiro() {
     if (compartilhando) return;
     setCompartilhando(true);
     try {
-      const res = await fetch(`${BASE}/roteiros/${id}/compartilhar`, {
+      const res = await apiFetch(`${BASE}/roteiros/${id}/compartilhar`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });

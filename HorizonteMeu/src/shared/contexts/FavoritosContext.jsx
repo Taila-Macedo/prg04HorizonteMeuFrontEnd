@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '../utils/apiFetch';
 
 const FavoritosContext = createContext();
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -17,7 +18,7 @@ export function FavoritosProvider({ children }) {
     
     try {
       setCarregando(true);
-      const res = await fetch(`${BASE}/favoritos/usuario/${usuario.id}`, {
+      const res = await apiFetch(`${BASE}/favoritos/usuario/${usuario.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -40,7 +41,7 @@ export function FavoritosProvider({ children }) {
     if (!usuario || !token) return null;
 
     try {
-      const res = await fetch(`${BASE}/favoritos`, {
+      const res = await apiFetch(`${BASE}/favoritos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ export function FavoritosProvider({ children }) {
     if (!token) return false;
 
     try {
-      const res = await fetch(`${BASE}/favoritos/${favoritoId}`, {
+      const res = await apiFetch(`${BASE}/favoritos/${favoritoId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

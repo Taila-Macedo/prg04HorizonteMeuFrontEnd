@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -33,7 +34,7 @@ export function useNovoRoteiro() {
     setSalvando(true);
     setErro('');
     try {
-      const res = await fetch(`${BASE}/roteiros`, {
+      const res = await apiFetch(`${BASE}/roteiros`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
