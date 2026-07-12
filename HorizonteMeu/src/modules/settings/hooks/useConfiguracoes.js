@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import { apiFetch } from '../../../shared/utils/apiFetch';
+import { getNotifPrefs, setNotifPrefs } from '../../../shared/utils/notificacaoPrefs';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -124,13 +125,25 @@ export function useConfiguracoes() {
   };
 
   // ── Notificações ───────────────────────────────────────────────────────────
-  const [notifs, setNotifs] = useState({
-    favoritos: true, roteiros: true, lembretes: true, promocoes: true, comentarios: false,
+  // Tipos reais gerados pelo backend (TipoNotificacao). A preferência controla
+  // se aquele tipo aparece na lista/badge de notificações — ver useNotificacoes.
+  const [notifs, setNotifsState] = useState({
+    CURTIDA: true, COMENTARIO: true, FOTO_APROVADA: true, CONTEUDO_REMOVIDO: true,
   });
 
+  // Carrega a preferência salva assim que sabemos quem é o usuário
+  useEffect(() => {
+    if (usuario?.id) {
+      setNotifsState(getNotifPrefs(usuario.id));
+    }
+  }, [usuario?.id]);
+
   const toggleNotif = (key) => {
-    setNotifs((prev) => ({ ...prev, [key]: !prev[key] }));
-    // Notificações são locais por enquanto — backend não tem essa tabela ainda
+    setNotifsState((prev) => {
+      const atualizado = { ...prev, [key]: !prev[key] };
+      setNotifPrefs(usuario?.id, atualizado);
+      return atualizado;
+    });
   };
 
   // ── Alterar Senha ──────────────────────────────────────────────────────────

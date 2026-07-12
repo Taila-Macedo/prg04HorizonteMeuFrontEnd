@@ -19,6 +19,7 @@ import DetalheRoteiroPage from './modules/itinerary/pages/DetalheRoteiro';
 import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro';
 import NotFoundPage from './modules/errors/pages/NotFound';
 import EditarComentarioPage from './modules/comments/pages/EditarComentario';
+import NotificacoesPage from './modules/notifications/pages/Notificacoes';
 import './App.css';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path="/pontos/:id/editar"   element={<PrivateRoute><EditarPontoPage /></PrivateRoute>} />
         <Route path="/pontos/:id/comentarios/:comentarioId/editar" element={<PrivateRoute><EditarComentarioPage /></PrivateRoute>} />
         <Route path="/favoritos"           element={<PrivateRoute><FavoritosPage /></PrivateRoute>} />
+        <Route path="/notificacoes"        element={<PrivateRoute><NotificacoesPage /></PrivateRoute>} />
         <Route path="/roteiros"            element={<PrivateRoute><RoteirosPage /></PrivateRoute>} />
         <Route path="/roteiros/novo"       element={<PrivateRoute><NovoRoteiroPage /></PrivateRoute>} />
         <Route path="/roteiros/:id"        element={<PrivateRoute><DetalheRoteiroPage /></PrivateRoute>} />

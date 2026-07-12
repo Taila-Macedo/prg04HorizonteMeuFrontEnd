@@ -2,6 +2,7 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Link } from 'react-router-dom';
 import { Search, Heart, Bell, Route, User, MapPin, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotificacoes } from '../../../modules/notifications/hooks/useNotificacoes';
 import './Navigation.css';
 
 export const Navigation = forwardRef(function Navigation(
@@ -9,6 +10,7 @@ export const Navigation = forwardRef(function Navigation(
   ref
 ) {
   const { usuario, estaLogado, eAdmin } = useAuth();
+  const { naoLidasCount } = useNotificacoes();
   const [pesquisa, setPesquisa] = useState('');
   const [coracaoPulsando, setCoracaoPulsando] = useState(false);
   const coracaoRef = useRef(null);
@@ -66,10 +68,9 @@ export const Navigation = forwardRef(function Navigation(
           />
         </Link>
 
-        {/* TODO: apontar para /notificacoes quando o módulo notifications/ for implementado */}
-        <Link to="/perfil" className="nav-action-btn nav-notificacao" title="Notificações">
+        <Link to="/notificacoes" className="nav-action-btn nav-notificacao" title="Notificações">
           <Bell size={20} />
-          <span className="nav-notification-badge"></span>
+          {naoLidasCount > 0 && <span className="nav-notification-badge"></span>}
         </Link>
 
         {/* Painel de Admin — só aparece pra quem tem perfil ADMINISTRADOR */}

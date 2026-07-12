@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   User, Bell, Lock, Trash2, ArrowLeft, LogOut,
-  Camera, Eye, EyeOff, Heart, MapPin, Tag, MessageCircle
+  Camera, Eye, EyeOff, Heart, MessageCircle, CheckCircle, AlertTriangle
 } from 'lucide-react';
 import { useConfiguracoes } from '../hooks/useConfiguracoes';
 import { useAuth } from '../../../shared/contexts/AuthContext';
@@ -130,14 +130,13 @@ export default function Configuracoes() {
               </div>
               <div className="cfg-card">
                 <h3 className="cfg-card-titulo"><Bell size={16} /> Tipos de notificações</h3>
-                <p className="cfg-card-subtitulo">Selecione os tipos de notificações que deseja receber.</p>
+                <p className="cfg-card-subtitulo">Escolha quais tipos de notificação você quer ver na sua central de notificações.</p>
                 <div className="cfg-notif-lista">
                   {[
-                    { key: 'favoritos',   icone: Heart,          label: 'Favoritos',             desc: 'Novos lugares e roteiros adicionados aos seus favoritos.' },
-                    { key: 'roteiros',    icone: MapPin,          label: 'Roteiros',              desc: 'Atualizações dos seus roteiros e comentários.' },
-                    { key: 'lembretes',   icone: Bell,            label: 'Lembretes de viagem',   desc: 'Lembretes sobre viagens e atividades agendadas.' },
-                    { key: 'promocoes',   icone: Tag,             label: 'Promoções e novidades', desc: 'Ofertas exclusivas e novidades da plataforma.' },
-                    { key: 'comentarios', icone: MessageCircle,   label: 'Comentários',           desc: 'Comentários nos seus roteiros e interações.' },
+                    { key: 'CURTIDA',           icone: Heart,          label: 'Curtidas',           desc: 'Quando alguém curtir um comentário seu.' },
+                    { key: 'COMENTARIO',        icone: MessageCircle,  label: 'Comentários',        desc: 'Novos comentários em pontos que você favoritou.' },
+                    { key: 'FOTO_APROVADA',     icone: CheckCircle,    label: 'Fotos aprovadas',     desc: 'Quando uma foto sua for aprovada pela moderação.' },
+                    { key: 'CONTEUDO_REMOVIDO', icone: AlertTriangle,  label: 'Conteúdo removido',  desc: 'Quando uma foto ou comentário seu for removido.' },
                   ].map(({ key, icone: Icone, label, desc }) => (
                     <div key={key} className="cfg-notif-item">
                       <div className="cfg-notif-info">
