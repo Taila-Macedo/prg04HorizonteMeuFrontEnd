@@ -34,11 +34,12 @@ function AdminToast({ toast, onClose }) {
 function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const {
-    users, photos, points, metrics,
+    users, photos, points, reports, metrics,
     loading, error,
     refresh,
     deleteUser, updateUser,
     approvePhoto, rejectPhoto,
+    resolveReport, rejectReport, resolveReportExcluindoConteudo,
   } = useAdminData();
   const { usuario, token, logout } = useAuth();
   const navigate = useNavigate();
@@ -67,15 +68,26 @@ function AdminDashboard() {
     );
   };
 
-  // ── Denúncias (mock — sprint futura) ───────────────────────────────────
-  const [reports] = useState([]);
+  // ── Denúncias ────────────────────────────────────────────────────────────
   const [confirmandoReportId,   setConfirmandoReportId]   = useState(null);
   const [confirmandoReportAcao, setConfirmandoReportAcao] = useState(null);
   const pedirConfirmacaoReport  = (id, acao) => { setConfirmandoReportId(id); setConfirmandoReportAcao(acao); };
   const cancelarConfirmacaoReport = () => { setConfirmandoReportId(null); setConfirmandoReportAcao(null); };
-  const confirmarAcaoReport = (id) => {
+  const confirmarAcaoReport = async (id) => {
+    const acao = confirmandoReportAcao;
     cancelarConfirmacaoReport();
-    mostrarToast(confirmandoReportAcao === 'resolver' ? 'Denúncia resolvida.' : 'Denúncia rejeitada.');
+
+    let ok;
+    if (acao === 'resolver') ok = await resolveReport(id);
+    else if (acao === 'excluir') ok = await resolveReportExcluindoConteudo(id);
+    else ok = await rejectReport(id);
+
+    const mensagens = {
+      resolver: ok ? 'Denúncia resolvida.' : 'Erro ao resolver denúncia.',
+      excluir:  ok ? 'Conteúdo excluído e denúncia resolvida.' : 'Erro ao excluir conteúdo.',
+      rejeitar: ok ? 'Denúncia rejeitada.' : 'Erro ao rejeitar denúncia.',
+    };
+    mostrarToast(mensagens[acao] ?? (ok ? 'Ação concluída.' : 'Erro ao processar denúncia.'), ok ? 'sucesso' : 'erro');
   };
 
   // ── Pontos turísticos ──────────────────────────────────────────────────
@@ -112,7 +124,7 @@ function AdminDashboard() {
   const shell = (conteudo) => (
     <div className="admin-shell">
       <AdminTopbar onLogout={handleLogout} />
-      <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} pendingPhotos={0} pendingReports={0} />
+      <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} pendingPhotos={0} pendingReports={metrics?.pendingReportsCount ?? reports.length} />
       <div className="admin-main">{conteudo}</div>
     </div>
   );
@@ -132,7 +144,7 @@ function AdminDashboard() {
               <MetricsCard value={metrics?.usersCount ?? '—'} label="Usuários cadastrados" subtext="total" trendType="up" />
               <MetricsCard value={metrics?.pointsCount ?? '—'} label="Pontos turísticos" subtext="total" trendType="neutral" />
               <MetricsCard value={metrics?.pendingPhotosCount ?? photos.length} label="Fotos aguardando aprovação" subtext="pendentes" trendType="warning" />
-              <MetricsCard value={reports.length} label="Denúncias pendentes" subtext="sprint futura" trendType="alert" />
+              <MetricsCard value={metrics?.pendingReportsCount ?? reports.length} label="Denúncias pendentes" subtext="pendentes" trendType="alert" />
             </div>
 
             <div className="content-grid">
@@ -203,7 +215,7 @@ function AdminDashboard() {
           <div className="admin-content">
             <div className="section-header">
               <h2>Denúncias Pendentes</h2>
-              <p>Módulo previsto para a próxima sprint</p>
+              <p>Gerencie denúncias de fotos, comentários e perfis</p>
             </div>
             <SectionCard title="Todas as denúncias" icon={AlertTriangle}>
               <ReportsTable
@@ -329,7 +341,7 @@ default:
         activeSection={activeSection}
         onSectionChange={setActiveSection}
         pendingPhotos={metrics?.pendingPhotosCount ?? photos.length}
-        pendingReports={0}
+        pendingReports={metrics?.pendingReportsCount ?? reports.length}
       />
       <div className="admin-main">{renderContent()}</div>
     </div>

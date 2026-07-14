@@ -35,4 +35,14 @@ export const adminService = {
   // Pontos turísticos — GET /pontos retorna Page<>, extraímos .content
   getPoints:   async (token) => extrairLista(await fetchWithAuth('/pontos?size=100', token)),
   deletePoint: (id, token)   => fetchWithAuth(`/pontos/${id}`, token, { method: 'DELETE' }),
+
+  // Denúncias — GET /denuncias/status/{status} retorna Page<>, extraímos .content
+  getPendingReports: async (token) =>
+    extrairLista(await fetchWithAuth('/denuncias/status/PENDENTE?size=100', token)),
+  resolveReport: (id, token) =>
+    fetchWithAuth(`/denuncias/${id}/resolver`, token, { method: 'PATCH' }),
+  rejectReport: (id, token) =>
+    fetchWithAuth(`/denuncias/${id}/rejeitar`, token, { method: 'PATCH' }),
+  resolveReportExcluindoConteudo: (id, token) =>
+    fetchWithAuth(`/denuncias/${id}/resolver-excluindo`, token, { method: 'PATCH' }),
 };

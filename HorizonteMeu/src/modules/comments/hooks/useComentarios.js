@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 import { useUploadFoto } from '../../../shared/hooks/useUploadFoto';
+import { apiFetch } from '../../../shared/utils/apiFetch';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -192,10 +193,40 @@ export function useComentarios(pontoId) {
     setMotivoDenuncia('');
   };
 
-  const enviarDenuncia = () => {
+  const enviarDenuncia = async () => {
     if (!motivoDenuncia.trim()) return;
-    alert('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
-    fecharDenuncia();
+
+    if (!usuario) {
+      alert('Você precisa estar logado para denunciar.');
+      return;
+    }
+
+    try {
+      const payload = {
+        motivo: motivoDenuncia.trim(),
+        idUsuario: usuario.id,
+        idComentario: denunciaModal.comentarioId,
+      };
+
+      const res = await apiFetch(`${BASE}/denuncias`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const erroBody = await res.json().catch(() => ({}));
+        throw new Error(erroBody.message || erroBody.mensagem || 'Erro ao enviar denúncia.');
+      }
+
+      alert('Denúncia enviada com sucesso. Nossa equipe irá analisar.');
+      fecharDenuncia();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return {
