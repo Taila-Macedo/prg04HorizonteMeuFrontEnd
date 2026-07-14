@@ -16,25 +16,22 @@ function CardFavorito({ favorito, onRemover }) {
   if (!ponto) return null;
 
   return (
-    <div className="card" style={{ cursor: 'pointer', position: 'relative' }}>
-      <div className="image-container" onClick={() => navigate(`/pontos/${ponto.id}`)}>
-        {/* Pontos do backend não têm campo de imagem — exibe placeholder */}
-        <div
-          style={{
-            width: '100%',
-            height: '160px',
-            background: 'linear-gradient(135deg, #1a3a6b, #0d1f3c)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'rgba(255,255,255,0.3)',
-            fontSize: '2.5rem',
-          }}
-        >
-          🗺️
-        </div>
-        <div className="tag-monumento">
-          <Landmark size={12} />
+    <div className="perfil-fav-card" style={{ cursor: 'pointer' }}>
+      <div className="perfil-fav-image-wrap" onClick={() => navigate(`/pontos/${ponto.id}`)}>
+        {ponto.fotoUrl ? (
+          <img
+            src={ponto.fotoUrl}
+            alt={ponto.nome}
+            className="perfil-fav-image"
+          />
+        ) : (
+          // Ponto sem foto aprovada na galeria ainda — exibe placeholder
+          <div className="perfil-fav-image perfil-fav-image-placeholder">
+            🗺️
+          </div>
+        )}
+        <div className="perfil-fav-tag">
+          <Landmark size={11} />
           {ponto.categoria}
         </div>
       </div>

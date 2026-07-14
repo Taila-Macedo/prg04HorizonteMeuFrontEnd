@@ -26,7 +26,7 @@ export function usePerfilDados() {
       if (!res.ok) throw new Error('Erro ao carregar favoritos.');
       const favs = await res.json(); // [{ id, dataSalvo, idPontoTuristico }]
 
-      // Para cada favorito busca os dados completos do ponto
+      // Para cada favorito busca os dados completos do ponto + a foto de capa
       const comDados = await Promise.all(
         (Array.isArray(favs) ? favs : []).map(async (fav) => {
           try {
@@ -34,7 +34,23 @@ export function usePerfilDados() {
               headers: authHeader,
             });
             const ponto = resPonto.ok ? await resPonto.json() : null;
-            return { ...fav, ponto };
+            if (!ponto) return { ...fav, ponto: null };
+
+            // O endpoint de ponto não traz foto — busca a galeria (público) e usa a 1ª aprovada
+            let fotoUrl = null;
+            try {
+              const resFotos = await apiFetch(`${BASE}/fotos/ponto/${fav.idPontoTuristico}`);
+              if (resFotos.ok) {
+                const fotos = await resFotos.json();
+                if (Array.isArray(fotos) && fotos.length > 0) {
+                  fotoUrl = fotos[0].url;
+                }
+              }
+            } catch {
+              // sem foto, mantém null
+            }
+
+            return { ...fav, ponto: { ...ponto, fotoUrl } };
           } catch {
             return { ...fav, ponto: null };
           }
