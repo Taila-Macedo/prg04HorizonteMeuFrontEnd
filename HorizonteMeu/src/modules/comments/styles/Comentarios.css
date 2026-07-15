@@ -221,6 +221,22 @@
   color: var(--branco);
 }
 
+.comentario-autor-link {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.comentario-autor-link:hover {
+  color: var(--dourado);
+  text-decoration: underline;
+}
+
+.comentario-autor-indisponivel {
+  color: rgba(244, 244, 244, 0.35);
+  font-style: italic;
+  cursor: default;
+}
+
 .comentario-editado-badge {
   font-size: 0.7rem;
   color: rgba(244, 244, 244, 0.4);

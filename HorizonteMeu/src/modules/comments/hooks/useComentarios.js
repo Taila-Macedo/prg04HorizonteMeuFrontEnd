@@ -41,17 +41,48 @@ export function useComentarios(pontoId) {
         const res = await fetch(`${BASE}/comentarios/ponto/${pontoId}`);
         if (!res.ok) throw new Error('Erro ao carregar avaliações.');
         const data = await res.json();
-        
-        const lista = (Array.isArray(data) ? data : []).map(c => {
+        const lista = Array.isArray(data) ? data : [];
+
+        // Busca o nome real de cada autor (uma vez por id, não por comentário)
+        // e detecta perfis que não existem mais (usuário excluído).
+        const idsUnicos = [...new Set(lista.map((c) => c.idUsuario))];
+        const cacheAutores = {};
+
+        await Promise.all(
+          idsUnicos.map(async (idAutor) => {
+            if (idAutor === usuario?.id) {
+              cacheAutores[idAutor] = { nome: usuario?.nome, disponivel: true };
+              return;
+            }
+            try {
+              const resAutor = await apiFetch(`${BASE}/usuarios/${idAutor}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (resAutor.status === 404) {
+                cacheAutores[idAutor] = { nome: 'Indisponível', disponivel: false };
+                return;
+              }
+              if (!resAutor.ok) throw new Error();
+              const dadosAutor = await resAutor.json();
+              cacheAutores[idAutor] = { nome: dadosAutor.nome, disponivel: true };
+            } catch {
+              cacheAutores[idAutor] = { nome: 'Indisponível', disponivel: false };
+            }
+          })
+        );
+
+        const listaComAutores = lista.map((c) => {
           const eMeu = c.idUsuario === usuario?.id || usuario?.perfil === 'ADMINISTRADOR';
+          const autor = cacheAutores[c.idUsuario] || { nome: 'Indisponível', disponivel: false };
           return {
             ...c,
-            autorNome: eMeu ? usuario?.nome : `Viajante #${c.idUsuario}`,
-            meu: eMeu
+            autorNome: autor.nome,
+            autorDisponivel: autor.disponivel,
+            meu: eMeu,
           };
         });
-        
-        setComentarios(lista);
+
+        setComentarios(listaComAutores);
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -60,7 +91,7 @@ export function useComentarios(pontoId) {
     };
 
     if (pontoId) carregarComentarios();
-  }, [pontoId, usuario]);
+  }, [pontoId, usuario, token]);
 
   // ── Novo comentário ──────────────────────────────────────────────────────────
 
@@ -86,7 +117,6 @@ export function useComentarios(pontoId) {
       let fotoUrl = null;
 
       if (novoComentario.fotoFile) {
-        // Usa endpoint de upload avulso — só sobe para Cloudinary, não salva no banco
         const formData = new FormData();
         formData.append('arquivo', novoComentario.fotoFile);
 
@@ -123,7 +153,7 @@ export function useComentarios(pontoId) {
       const salvo = await res.json();
 
       setComentarios((prev) => [
-        { ...salvo, autorNome: usuario.nome, meu: true },
+        { ...salvo, autorNome: usuario.nome, autorDisponivel: true, meu: true },
         ...prev,
       ]);
       setNovoComentario({ texto: '', nota: 5, fotoPreview: null, fotoFile: null });

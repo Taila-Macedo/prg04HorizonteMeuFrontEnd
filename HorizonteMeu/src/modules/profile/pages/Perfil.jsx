@@ -76,7 +76,7 @@ function CardFavorito({ favorito, onRemover }) {
 }
 
 // ─── Card inline de roteiro ────────────────────────────────────────────────
-function CardRoteiro({ roteiro }) {
+export  function CardRoteiro({ roteiro }) {
   const navigate = useNavigate();
   return (
     <div

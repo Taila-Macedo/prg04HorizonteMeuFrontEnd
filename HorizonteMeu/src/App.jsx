@@ -20,6 +20,7 @@ import EditarRoteiroPage from './modules/itinerary/pages/EditarRoteiro';
 import NotFoundPage from './modules/errors/pages/NotFound';
 import EditarComentarioPage from './modules/comments/pages/EditarComentario';
 import NotificacoesPage from './modules/notifications/pages/Notificacoes';
+import PerfilPublico from './modules/profile/pages/PerfilPublico';
 import './App.css';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
         <Route path="/dashboard"           element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/perfil"              element={<PrivateRoute><PerfilPage /></PrivateRoute>} />
+        <Route path="/usuarios/:id"        element={<PrivateRoute><PerfilPublico   /></PrivateRoute>} />
         <Route path="/configuracoes"       element={<PrivateRoute><ConfiguracoesPage /></PrivateRoute>} />
         <Route path="/pontos"              element={<PrivateRoute><ListaPontosPage /></PrivateRoute>} />
         <Route path="/pontos/novo"         element={<PrivateRoute><AdicionarPontoPage /></PrivateRoute>} />

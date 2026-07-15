@@ -122,7 +122,19 @@ export function ComentariosSecao({ pontoId }) {
                 </div>
                 <div className="comentario-header-info">
                   <div className="comentario-autor-linha">
-                    <span className="comentario-autor">{c.autorNome}</span>
+                    {c.autorDisponivel ? (
+                      <span
+                        className="comentario-autor comentario-autor-link"
+                        onClick={() => navigate(`/usuarios/${c.idUsuario}`)}
+                        title="Ver perfil"
+                      >
+                        {c.autorNome}
+                      </span>
+                    ) : (
+                      <span className="comentario-autor comentario-autor-indisponivel">
+                        {c.autorNome}
+                      </span>
+                    )}
                     {c.editado && <span className="comentario-editado-badge">editado</span>}
                   </div>
                   <Estrelas nota={c.nota} tamanho={13} />
@@ -144,7 +156,6 @@ export function ComentariosSecao({ pontoId }) {
                   {c.curtidas}
                 </button>
 
-                {/* Ações do próprio comentário */}
                 {c.meu && (
                   <>
                     <button className="btn-editar-comentario" onClick={() => handleEditar(c)}>
@@ -169,7 +180,6 @@ export function ComentariosSecao({ pontoId }) {
                 )}
               </div>
 
-              {/* Confirmação de exclusão inline */}
               {confirmacaoExcluir.aberto && confirmacaoExcluir.comentarioId === c.id && (
                 <div className="confirmacao-excluir">
                   <p>Excluir esta avaliação?</p>
