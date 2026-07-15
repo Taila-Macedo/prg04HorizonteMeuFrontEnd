@@ -12,7 +12,6 @@ const MENU = [
   { key: 'perfil',       label: 'Editar Perfil', icone: User,   perigo: false },
   { key: 'notificacoes', label: 'Notificações',  icone: Bell,   perigo: false },
   { key: 'senha',        label: 'Alterar Senha', icone: Lock,   perigo: false },
-  { key: 'excluir',      label: 'Excluir Conta', icone: Trash2, perigo: true  },
 ];
 
 export default function Configuracoes() {
@@ -217,49 +216,6 @@ export default function Configuracoes() {
                     {cfg.toastSenha.tipo === 'erro' ? '❌' : '✅'} {cfg.toastSenha.msg}
                   </div>
                 )}
-              </div>
-            </section>
-          )}
-
-          {/* ── EXCLUIR CONTA ── */}
-          {cfg.abaAtiva === 'excluir' && (
-            <section className="cfg-secao">
-              <div className="cfg-secao-header cfg-secao-header-perigo">
-                <div><h1>Excluir Conta Permanentemente</h1><p>Esta ação é irreversível.</p></div>
-              </div>
-              <div className="cfg-card cfg-card-perigo">
-                <p className="cfg-excluir-aviso">Todos os seus dados serão removidos permanentemente:</p>
-                <ul className="cfg-excluir-lista">
-                  {['Perfil', 'Viagens', 'Roteiros', 'Favoritos', 'Comentários', 'Fotos enviadas'].map(item => (
-                    <li key={item}>✓ {item}</li>
-                  ))}
-                </ul>
-                <div className="cfg-campos" style={{ marginTop: '28px' }}>
-                  <div className="cfg-campo-grupo">
-                    <label className="cfg-label">Digite sua senha para confirmar</label>
-                    <input className="cfg-input" type="password" value={cfg.excluir.senha}
-                      onChange={(e) => cfg.setExcluir(x => ({ ...x, senha: e.target.value }))}
-                      placeholder="Digite sua senha atual" />
-                  </div>
-                  <div className="cfg-campo-grupo">
-                    <label className="cfg-label">Digite "EXCLUIR MINHA CONTA" para confirmar</label>
-                    <input className="cfg-input" type="text" value={cfg.excluir.confirmacao}
-                      onChange={(e) => cfg.setExcluir(x => ({ ...x, confirmacao: e.target.value }))}
-                      placeholder="EXCLUIR MINHA CONTA" />
-                  </div>
-                  <label className="cfg-checkbox-label">
-                    <input type="checkbox" checked={cfg.excluir.ciente}
-                      onChange={(e) => cfg.setExcluir(x => ({ ...x, ciente: e.target.checked }))} />
-                    <span>Entendo que esta ação não poderá ser desfeita</span>
-                  </label>
-                </div>
-                <div className="cfg-acoes cfg-acoes-senha">
-                  <button className="cfg-btn-cancelar" onClick={() => cfg.setAbaAtiva('perfil')}>Cancelar</button>
-                  <button className="cfg-btn-excluir" onClick={cfg.handleExcluirConta}
-                    disabled={!cfg.excluir.senha || cfg.excluir.confirmacao !== 'EXCLUIR MINHA CONTA' || !cfg.excluir.ciente || cfg.salvando}>
-                    {cfg.salvando ? 'Excluindo...' : 'Excluir'}
-                  </button>
-                </div>
               </div>
             </section>
           )}

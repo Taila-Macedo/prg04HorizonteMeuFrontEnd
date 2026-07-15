@@ -26,6 +26,7 @@ export default function DetalheRoteiro() {
     totalPontos,
     pontosVisitados,
     progresso,
+    souDono,
     formatarData,
     toggleVisitado,
     handleCompartilhar,
@@ -109,15 +110,17 @@ export default function DetalheRoteiro() {
             )}
           </div>
 
-          {/* Ações: editar + compartilhar */}
+          {/* Ações: editar (só o dono) + compartilhar (todo mundo) */}
           <div className="dr-acoes">
-            <button
-              className="dr-btn-editar"
-              onClick={() => navigate(`/roteiros/${roteiro.id}/editar`)}
-            >
-              <Pencil size={16} />
-              Editar roteiro
-            </button>
+            {souDono && (
+              <button
+                className="dr-btn-editar"
+                onClick={() => navigate(`/roteiros/${roteiro.id}/editar`)}
+              >
+                <Pencil size={16} />
+                Editar roteiro
+              </button>
+            )}
 
             <button
               className={`dr-btn-compartilhar ${linkCopiado ? 'copiado' : ''}`}
@@ -173,12 +176,14 @@ export default function DetalheRoteiro() {
             <div className="dr-pontos-vazio">
               <MapPin size={40} opacity={0.3} />
               <p>Este roteiro ainda não tem paradas.</p>
-              <button
-                className="dr-btn-add-ponto"
-                onClick={() => navigate(`/roteiros/${roteiro.id}/editar`)}
-              >
-                Adicionar paradas
-              </button>
+              {souDono && (
+                <button
+                  className="dr-btn-add-ponto"
+                  onClick={() => navigate(`/roteiros/${roteiro.id}/editar`)}
+                >
+                  Adicionar paradas
+                </button>
+              )}
             </div>
           ) : (
             <ul className="dr-pontos-lista">
@@ -201,18 +206,28 @@ export default function DetalheRoteiro() {
                       )}
                     </div>
 
-                    {/* Checkbox de visitado */}
-                    <button
-                      className="dr-ponto-check"
-                      onClick={() => toggleVisitado(ponto.id, ponto.visitado)}
-                      title={ponto.visitado ? 'Marcar como não visitado' : 'Marcar como visitado'}
-                    >
-                      {ponto.visitado ? (
-                        <CheckCircle2 size={22} className="check-ativo" />
-                      ) : (
-                        <Circle size={22} className="check-inativo" />
-                      )}
-                    </button>
+                    {/* Checkbox de visitado — só o dono do roteiro pode marcar */}
+                    {souDono ? (
+                      <button
+                        className="dr-ponto-check"
+                        onClick={() => toggleVisitado(ponto.id, ponto.visitado)}
+                        title={ponto.visitado ? 'Marcar como não visitado' : 'Marcar como visitado'}
+                      >
+                        {ponto.visitado ? (
+                          <CheckCircle2 size={22} className="check-ativo" />
+                        ) : (
+                          <Circle size={22} className="check-inativo" />
+                        )}
+                      </button>
+                    ) : (
+                      <span className="dr-ponto-check dr-ponto-check-readonly" title="Somente o dono do roteiro pode marcar como visitado">
+                        {ponto.visitado ? (
+                          <CheckCircle2 size={22} className="check-ativo" />
+                        ) : (
+                          <Circle size={22} className="check-inativo" />
+                        )}
+                      </span>
+                    )}
                   </li>
                 ))}
             </ul>

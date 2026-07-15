@@ -198,29 +198,6 @@ export function useConfiguracoes() {
     }
   };
 
-  // ── Excluir Conta ──────────────────────────────────────────────────────────
-  const [excluir, setExcluir] = useState({ senha: '', confirmacao: '', ciente: false });
-
-  const handleExcluirConta = async () => {
-    if (!excluir.senha || excluir.confirmacao !== 'EXCLUIR MINHA CONTA' || !excluir.ciente) return;
-
-    setSalvando(true);
-    try {
-      const res = await apiFetch(`${BASE}/usuarios/${usuario.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error('Erro ao excluir conta.');
-
-      logout();
-      navigate('/login');
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setSalvando(false);
-    }
-  };
 
   return {
     abaAtiva, setAbaAtiva, salvando,
@@ -228,6 +205,5 @@ export function useConfiguracoes() {
     fotoPerfilPreview, enviandoFoto, handleAlterarFotoPerfil,
     notifs, toggleNotif,
     senha, setSenha, mostrarSenhas, toggleMostrarSenha, forcaSenha, toastSenha, handleAlterarSenha,
-    excluir, setExcluir, handleExcluirConta,
   };
 }

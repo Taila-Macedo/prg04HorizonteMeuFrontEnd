@@ -438,6 +438,15 @@
   transform: scale(1.1);
 }
 
+.dr-ponto-check-readonly {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.dr-ponto-check-readonly:hover {
+  transform: none;
+}
+
 .check-ativo {
   color: #4ade80;
 }

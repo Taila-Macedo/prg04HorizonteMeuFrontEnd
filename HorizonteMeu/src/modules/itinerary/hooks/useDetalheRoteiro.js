@@ -8,7 +8,7 @@ const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export function useDetalheRoteiro() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { usuario, token } = useAuth();
 
   const [roteiro, setRoteiro]   = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -54,7 +54,10 @@ export function useDetalheRoteiro() {
 
   // Alterna o campo visitado de um ponto do roteiro
   // PATCH /roteiros/pontos/{idRoteiroPonto}?visitado=true|false
+  // Só o dono do roteiro pode marcar progresso — visitante só visualiza.
   const toggleVisitado = async (idRoteiroPonto, valorAtual) => {
+    if (usuario?.id !== roteiro?.idUsuario) return;
+
     const novoValor = !valorAtual;
 
     // Atualiza otimistamente na tela
@@ -87,19 +90,26 @@ export function useDetalheRoteiro() {
   };
 
   // Torna o roteiro público e copia o link — PATCH /roteiros/{id}/compartilhar
+  // Visitante (não-dono) só copia o link — não pode alterar a visibilidade
+  // de um roteiro que não é dele.
   const handleCompartilhar = async () => {
     if (compartilhando) return;
     setCompartilhando(true);
+
+    const souDono = usuario?.id === roteiro?.idUsuario;
+
     try {
-      const res = await apiFetch(`${BASE}/roteiros/${id}/compartilhar`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      if (souDono) {
+        const res = await apiFetch(`${BASE}/roteiros/${id}/compartilhar`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
 
-      if (!res.ok) throw new Error('Erro ao compartilhar roteiro.');
+        if (!res.ok) throw new Error('Erro ao compartilhar roteiro.');
 
-      const atualizado = await res.json();
-      setRoteiro(atualizado);
+        const atualizado = await res.json();
+        setRoteiro(atualizado);
+      }
 
       const link = `${window.location.origin}/roteiros/${id}`;
       await navigator.clipboard.writeText(link);
@@ -116,6 +126,7 @@ export function useDetalheRoteiro() {
   const totalPontos     = roteiro?.pontos?.length ?? 0;
   const pontosVisitados = roteiro?.pontos?.filter((p) => p.visitado).length ?? 0;
   const progresso       = totalPontos > 0 ? Math.round((pontosVisitados / totalPontos) * 100) : 0;
+  const souDono         = !!roteiro && usuario?.id === roteiro.idUsuario;
 
   return {
     roteiro,
@@ -126,6 +137,7 @@ export function useDetalheRoteiro() {
     totalPontos,
     pontosVisitados,
     progresso,
+    souDono,
     formatarData,
     toggleVisitado,
     handleCompartilhar,
