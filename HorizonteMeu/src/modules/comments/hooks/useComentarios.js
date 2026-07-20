@@ -38,7 +38,12 @@ export function useComentarios(pontoId) {
     const carregarComentarios = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${BASE}/comentarios/ponto/${pontoId}`);
+        // ALTERADO — envia idUsuario (quando logado) para o backend já
+        // retornar em cada comentário se o usuário atual o curtiu ou não (RN21)
+        const url = usuario?.id
+          ? `${BASE}/comentarios/ponto/${pontoId}?idUsuario=${usuario.id}`
+          : `${BASE}/comentarios/ponto/${pontoId}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error('Erro ao carregar avaliações.');
         const data = await res.json();
         const lista = Array.isArray(data) ? data : [];
@@ -165,23 +170,40 @@ export function useComentarios(pontoId) {
 
   // ── Curtir ───────────────────────────────────────────────────────────────────
 
+  // ALTERADO (RN21): agora envia o idUsuario (obrigatório no backend) e
+  // sincroniza o campo "curtido" retornado, além de bloquear cliques
+  // repetidos enquanto a requisição está em andamento — evita que o
+  // mesmo usuário curta o mesmo comentário mais de uma vez.
+  const curtindoRef = useRef(new Set());
+
   const toggleCurtir = async (comentarioId) => {
-    if (!token) return;
+    if (!token || !usuario) return;
+
+    // Impede clique duplo/repetido enquanto a requisição anterior não terminou
+    if (curtindoRef.current.has(comentarioId)) return;
+    curtindoRef.current.add(comentarioId);
 
     try {
-      const res = await fetch(`${BASE}/comentarios/${comentarioId}/curtir`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await fetch(
+        `${BASE}/comentarios/${comentarioId}/curtir?idUsuario=${usuario.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` },
+        }
+      );
 
       if (res.ok) {
         const atualizado = await res.json();
-        setComentarios(prev => prev.map(c => 
-          c.id === comentarioId ? { ...c, curtidas: atualizado.curtidas } : c
+        setComentarios(prev => prev.map(c =>
+          c.id === comentarioId
+            ? { ...c, curtidas: atualizado.curtidas, curtido: atualizado.curtido }
+            : c
         ));
       }
     } catch (err) {
       console.error('Erro ao curtir:', err);
+    } finally {
+      curtindoRef.current.delete(comentarioId);
     }
   };
 
