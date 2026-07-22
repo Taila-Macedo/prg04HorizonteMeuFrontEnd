@@ -59,22 +59,6 @@ export function useAdminData() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const deleteUser = async (id) => {
-    try {
-      await adminService.deleteUser(id, token);
-      setUsers(prev => prev.filter(u => u.id !== id));
-      return true;
-    } catch (err) { console.error(err); return false; }
-  };
-
-  const updateUser = async (id, dados) => {
-    try {
-      const atualizado = await adminService.updateUser(id, dados, token);
-      setUsers(prev => prev.map(u => u.id === id ? { ...u, ...atualizado } : u));
-      return true;
-    } catch (err) { console.error(err); return false; }
-  };
-
   const approvePhoto = async (id) => {
     try {
       await adminService.approvePhoto(id, token);
@@ -123,7 +107,6 @@ export function useAdminData() {
     users, photos, points, reports, metrics,
     loading, error,
     refresh: loadData,
-    deleteUser, updateUser,
     approvePhoto, rejectPhoto,
     resolveReport, rejectReport, resolveReportExcluindoConteudo,
   };

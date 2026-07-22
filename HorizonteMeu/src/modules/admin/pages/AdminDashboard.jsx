@@ -37,7 +37,6 @@ function AdminDashboard() {
     users, photos, points, reports, metrics,
     loading, error,
     refresh,
-    deleteUser, updateUser,
     approvePhoto, rejectPhoto,
     resolveReport, rejectReport, resolveReportExcluindoConteudo,
   } = useAdminData();
@@ -100,24 +99,6 @@ function AdminDashboard() {
     const ok = await adminService.deletePoint(id, token).then(() => true).catch(() => false);
     mostrarToast(ok ? 'Ponto excluído.' : 'Erro ao excluir ponto.', ok ? 'sucesso' : 'erro');
     if (ok) refresh();
-  };
-
-  // ── Usuários ───────────────────────────────────────────────────────────
-  const handleUserDelete = async (user) => {
-    const ok = await deleteUser(user.id);
-    mostrarToast(
-      ok ? `Usuário "${user.nome}" excluído.` : 'Erro ao excluir usuário.',
-      ok ? 'sucesso' : 'erro'
-    );
-  };
-
-  const handleUserSave = async (user, dadosEditados) => {
-    const ok = await updateUser(user.id, dadosEditados);
-    mostrarToast(
-      ok ? `Usuário "${dadosEditados.nome}" atualizado.` : 'Erro ao atualizar usuário.',
-      ok ? 'sucesso' : 'erro'
-    );
-    return ok;
   };
 
   // ── Loading / Erro ─────────────────────────────────────────────────────
@@ -321,8 +302,6 @@ function AdminDashboard() {
             <div className="section-card-wrapper">
               <PainelAdm
                 users={users}
-                onSave={handleUserSave}
-                onDelete={handleUserDelete}
               />
             </div>
           </div>

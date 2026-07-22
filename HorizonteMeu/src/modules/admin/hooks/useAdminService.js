@@ -22,10 +22,7 @@ const extrairLista = (data) => {
 
 export const adminService = {
   // Usuários — GET /usuarios retorna Page<>, extraímos .content
-  getUsers:   async (token) => extrairLista(await fetchWithAuth('/usuarios?size=100', token)),
-  getUserById: (id, token)  => fetchWithAuth(`/usuarios/${id}`, token),
-  deleteUser:  (id, token)  => fetchWithAuth(`/usuarios/${id}`, token, { method: 'DELETE' }),
-  updateUser:  (id, data, token) => fetchWithAuth(`/usuarios/${id}`, token, { method: 'PUT', body: JSON.stringify(data) }),
+  getUsers: async (token) => extrairLista(await fetchWithAuth('/usuarios?size=100', token)),
 
   // Fotos pendentes — retorna lista pura (não paginada)
   getPendingPhotos: (token)      => fetchWithAuth('/fotos/aprovacao?aprovado=false', token),
